@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.blahti.example.drag2.DragLayer xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
+    android:id="@+id/drag_layer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="TextView" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/Image1"
+        android:layout_width="80px"
+        android:layout_height="100px"
+        android:layout_weight="50"
+        android:adjustViewBounds="true"
+        android:src="@drawable/photo1" />
+
+    <ImageView
+        android:id="@+id/Image2"
+        android:layout_width="50px"
+        android:layout_height="80px"
+        android:layout_weight="50"
+        android:adjustViewBounds="true"
+        android:src="@drawable/photo2" />
+
+</com.blahti.example.drag2.DragLayer>
