@@ -49,14 +49,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	 */
 	// Constants
 
-	private static final int ENABLE_S2_MENU_ID = Menu.FIRST;
-	private static final int DISABLE_S2_MENU_ID = Menu.FIRST + 1;
-	private static final int ADD_OBJECT_MENU_ID = Menu.FIRST + 2;
-	private static final int CHANGE_TOUCH_MODE_MENU_ID = Menu.FIRST + 3;
-	private static final int PLAY_ANIM = Menu.FIRST + 4 ;
-	private static final int RESET = Menu.FIRST + 5 ;
-	private static final int PLAY_STEP = Menu.FIRST + 6 ;
-	private static final int DELETE_FILE = Menu.FIRST + 7 ;
+//	private static final int ENABLE_S2_MENU_ID = Menu.FIRST;
+//	private static final int DISABLE_S2_MENU_ID = Menu.FIRST + 1;
+	private static final int ADD_OBJECT_MENU_ID = Menu.FIRST + 1;
+//	private static final int CHANGE_TOUCH_MODE_MENU_ID = Menu.FIRST + 3;
+	private static final int PLAY_ANIM = Menu.FIRST + 2 ;
+	private static final int RESET = Menu.FIRST + 3 ;
+	private static final int PLAY_STEP = Menu.FIRST + 4 ;
+	private static final int DELETE_FILE = Menu.FIRST + 5 ;
 
 	/**
 	 */
@@ -66,7 +66,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	private DragLayer mDragLayer;             // The ViewGroup that supports drag-drop.
 	private DropSpot mSpot2;                  // The DropSpot that can be turned on and off via the menu.
 	private boolean mLongClickStartsDrag = false;    // If true, it takes a long click to start the drag operation.
-	// Otherwise, any touch event starts a drag.
+	// Otherwise, only longTouch event starts a drag.
 
 
 	public static TextView dragInfo ;
@@ -111,10 +111,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	{
 		super.onCreateOptionsMenu(menu);
 
-		menu.add(0, ENABLE_S2_MENU_ID, 0, "Enable Spot2").setShortcut('1', 'c');
-		menu.add(0, DISABLE_S2_MENU_ID, 0, "Disable Spot2").setShortcut('2', 'c');
+//		menu.add(0, ENABLE_S2_MENU_ID, 0, "Enable Spot2").setShortcut('1', 'c');
+//		menu.add(0, DISABLE_S2_MENU_ID, 0, "Disable Spot2").setShortcut('2', 'c');
 		menu.add(0, ADD_OBJECT_MENU_ID, 0, "Add View").setShortcut('9', 'z');
-		menu.add (0, CHANGE_TOUCH_MODE_MENU_ID, 0, "Change Touch Mode");
+//		menu.add (0, CHANGE_TOUCH_MODE_MENU_ID, 0, "Change Touch Mode");
 		menu.add(0, PLAY_ANIM, 0, "Play Animation") ;
 		menu.add(0, RESET, 0, "Reset") ;
 		menu.add(0,PLAY_STEP,0,"Step Mode") ;
@@ -173,12 +173,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//mPaint.setAlpha(0xFF);
 
 		switch (item.getItemId()) {
-		case ENABLE_S2_MENU_ID:
-			if (mSpot2 != null) mSpot2.setDragLayer (mDragLayer);
-			return true;
-		case DISABLE_S2_MENU_ID:
-			if (mSpot2 != null) mSpot2.setDragLayer (null);
-			return true;
+//		case ENABLE_S2_MENU_ID:
+//			if (mSpot2 != null) mSpot2.setDragLayer (mDragLayer);
+//			return true;
+//		case DISABLE_S2_MENU_ID:
+//			if (mSpot2 != null) mSpot2.setDragLayer (null);
+//			return true;
 		case ADD_OBJECT_MENU_ID:
 			// Add a new object to the DragLayer and see if it can be dragged around.
 			ImageView newView = new ImageView (this);
@@ -195,12 +195,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			newView.setOnLongClickListener(this);
 			newView.setOnTouchListener(this);
 			return true;
-		case CHANGE_TOUCH_MODE_MENU_ID:
-			mLongClickStartsDrag = !mLongClickStartsDrag;
-			String message = mLongClickStartsDrag ? "Changed touch mode. Drag now starts on long touch (click)." 
-					: "Changed touch mode. Drag now starts on touch (click).";
-			Toast.makeText (getApplicationContext(), message, Toast.LENGTH_LONG).show ();
-			return true;
+//		case CHANGE_TOUCH_MODE_MENU_ID:
+//			mLongClickStartsDrag = !mLongClickStartsDrag;
+//			String message = mLongClickStartsDrag ? "Changed touch mode. Drag now starts on long touch (click)." 
+//					: "Changed touch mode. Drag now starts on touch (click).";
+//			Toast.makeText (getApplicationContext(), message, Toast.LENGTH_LONG).show ();
+//			return true;
 		case PLAY_ANIM:
 			FileInputStream fis = null ;
 			
