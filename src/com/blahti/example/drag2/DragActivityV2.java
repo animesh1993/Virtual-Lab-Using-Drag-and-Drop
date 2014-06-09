@@ -209,13 +209,37 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			/* Option Menu for selecting Image */
 			final ImageView newView = new ImageView (this);
 			CharSequence equipment[] = new CharSequence[] {"burrete", "beaker", "testtube"};
-
+			
+			/* For saving adding image into the csv data file*/
+			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Pick an equipment");
 			builder.setItems(equipment, new DialogInterface.OnClickListener() {
 			    @Override
 			    public void onClick(DialogInterface dialog, int which) {
-			        // the user clicked on colors[which]
+			        // the user clicked on equipment[which]
+			    	FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+			    	try {
+						fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    	
+			    	try {
+						fos.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    	
 			    	switch(which)
 			    	{
 			    	case 0:
@@ -248,6 +272,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			newView.setOnClickListener(this);
 			newView.setOnLongClickListener(this);
 			newView.setOnTouchListener(this);
+            
 			return true;
 
 //			image1 = (ImageView)findViewById(R.id.image1);			   
@@ -459,8 +484,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					}
 
 					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-
-					nextMove(reader);
+					char moveRead = nextMove(reader)  ;
+					
 				}
 
 			}
@@ -468,11 +493,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		logoFocus.startAnimation(anim);
 	}
 
-	public void nextMove(BufferedReader reader)
+	public char nextMove(BufferedReader reader)
 	{
 		int imageId ;
+		char caseRead = 'm'; 
 		float initX, finX, initY, finY ;
 		String[] RowData = null;
+		int imageAdded = 0 ;
 		int i = 1 ;
 		try {
 			String line;
@@ -485,13 +512,54 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			{
 
 				RowData = line.split(",");
-				imageId = Integer.parseInt(RowData[0]);
-				initX = Float.parseFloat(RowData[1]);
-				initY = Float.parseFloat(RowData[2]) ;
-				finX = Float.parseFloat(RowData[3]) ;
-				finY = Float.parseFloat(RowData[4]) ;
-
-				anim(imageId,initX,initY,finX,finY);
+				switch(RowData[0].charAt(0))
+				{
+				case 'a' :
+					imageAdded = Integer.parseInt(RowData[1]) ;
+					imageId = Integer.parseInt(RowData[2]) ;
+					ImageView newView = new ImageView (this);
+					switch(imageAdded)
+			    	{
+			    	case 0:
+			    		newView.setImageResource(R.drawable.burrete);
+			    		break ;
+			    	case 1:
+			    		newView.setImageResource(R.drawable.beaker);
+			    		break ;
+			    	case 2:
+			    		newView.setImageResource(R.drawable.testtube);
+			    		break ;
+			    	default:
+			    		break ;	
+			    	}
+					
+					newView.setId(imageId);
+					int w = 60;
+					int h = 60;
+					int left = 80;
+					int top = 100;
+					DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+					mDragLayer.addView (newView, lp);
+					newView.setOnClickListener(this);
+					newView.setOnLongClickListener(this);
+					newView.setOnTouchListener(this);
+//					nextMove(reader) ;
+					
+					caseRead = 'a' ;
+					break ;
+					
+				case 'm':
+					
+					imageId = Integer.parseInt(RowData[1]);
+					initX = Float.parseFloat(RowData[2]);
+					initY = Float.parseFloat(RowData[3]) ;
+					finX = Float.parseFloat(RowData[4]) ;
+					finY = Float.parseFloat(RowData[5]) ;
+					anim(imageId,initX,initY,finX,finY);
+					caseRead = 'm' ;
+					break ;
+				}
+				
 			}
 		}
 		catch (IOException ex) {
@@ -500,6 +568,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		{
 			lineNo++ ;
 		}
+		
+//		if(caseRead == 'a')
+//		{
+//			nextMove(reader) ;
+//		}
+		
+		return caseRead; 
 	}
 
 	private class LoadImageTask extends AsyncTask<String, Void, Bitmap>{

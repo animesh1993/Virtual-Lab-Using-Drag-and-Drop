@@ -465,7 +465,8 @@ public class DragController {
 				}
                 try {
 					fos.write((
-							viewId +
+							"m" + 
+							"," +viewId +
 							"," + (xInitial-mTouchOffsetX)+
 							"," +  (yInitial-mTouchOffsetY) +
 							"," + (xFinal-mTouchOffsetX) +
