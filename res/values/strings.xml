@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Touch and hold to drag a view</string>
     <string name="app_name">Drop Zones</string>
+    <string name="InfoData">Raw Data</string>
 </resources>

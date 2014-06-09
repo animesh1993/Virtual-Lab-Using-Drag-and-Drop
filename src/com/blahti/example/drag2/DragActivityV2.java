@@ -6,14 +6,23 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.Buffer;
 
 import com.blahti.example.drag2.R;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.inputmethodservice.Keyboard.Row;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -49,10 +58,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	 */
 	// Constants
 
-//	private static final int ENABLE_S2_MENU_ID = Menu.FIRST;
-//	private static final int DISABLE_S2_MENU_ID = Menu.FIRST + 1;
+	//	private static final int ENABLE_S2_MENU_ID = Menu.FIRST;
+	//	private static final int DISABLE_S2_MENU_ID = Menu.FIRST + 1;
 	private static final int ADD_OBJECT_MENU_ID = Menu.FIRST + 1;
-//	private static final int CHANGE_TOUCH_MODE_MENU_ID = Menu.FIRST + 3;
+	//	private static final int CHANGE_TOUCH_MODE_MENU_ID = Menu.FIRST + 3;
 	private static final int PLAY_ANIM = Menu.FIRST + 2 ;
 	private static final int RESET = Menu.FIRST + 3 ;
 	private static final int PLAY_STEP = Menu.FIRST + 4 ;
@@ -64,16 +73,17 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	private DragController mDragController;   // Object that sends out drag-drop events while a view is being moved.
 	private DragLayer mDragLayer;             // The ViewGroup that supports drag-drop.
-	private DropSpot mSpot2;                  // The DropSpot that can be turned on and off via the menu.
+//	private DropSpot mSpot2;                  // The DropSpot that can be turned on and off via the menu.
 	private boolean mLongClickStartsDrag = false;    // If true, it takes a long click to start the drag operation.
 	// Otherwise, only longTouch event starts a drag.
 
 
 	public static TextView dragInfo ;
 	//public static int imageNo = 2 ;
-//	private static boolean animComplete = true ;
+	//	private static boolean animComplete = true ;
 	private static int lineNo = 1 ;
 	private static boolean stepMode = false ;
+	String targetUrl = "http://goo.gl/qfGTN3";
 
 	public static final boolean Debugging = false;
 
@@ -111,10 +121,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	{
 		super.onCreateOptionsMenu(menu);
 
-//		menu.add(0, ENABLE_S2_MENU_ID, 0, "Enable Spot2").setShortcut('1', 'c');
-//		menu.add(0, DISABLE_S2_MENU_ID, 0, "Disable Spot2").setShortcut('2', 'c');
+		//		menu.add(0, ENABLE_S2_MENU_ID, 0, "Enable Spot2").setShortcut('1', 'c');
+		//		menu.add(0, DISABLE_S2_MENU_ID, 0, "Disable Spot2").setShortcut('2', 'c');
 		menu.add(0, ADD_OBJECT_MENU_ID, 0, "Add View").setShortcut('9', 'z');
-//		menu.add (0, CHANGE_TOUCH_MODE_MENU_ID, 0, "Change Touch Mode");
+		//		menu.add (0, CHANGE_TOUCH_MODE_MENU_ID, 0, "Change Touch Mode");
 		menu.add(0, PLAY_ANIM, 0, "Play Animation") ;
 		menu.add(0, RESET, 0, "Reset") ;
 		menu.add(0,PLAY_STEP,0,"Step Mode") ;
@@ -173,16 +183,60 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//mPaint.setAlpha(0xFF);
 
 		switch (item.getItemId()) {
-//		case ENABLE_S2_MENU_ID:
-//			if (mSpot2 != null) mSpot2.setDragLayer (mDragLayer);
-//			return true;
-//		case DISABLE_S2_MENU_ID:
-//			if (mSpot2 != null) mSpot2.setDragLayer (null);
-//			return true;
+		//		case ENABLE_S2_MENU_ID:
+		//			if (mSpot2 != null) mSpot2.setDragLayer (mDragLayer);
+		//			return true;
+		//		case DISABLE_S2_MENU_ID:
+		//			if (mSpot2 != null) mSpot2.setDragLayer (null);
+		//			return true;
 		case ADD_OBJECT_MENU_ID:
 			// Add a new object to the DragLayer and see if it can be dragged around.
-			ImageView newView = new ImageView (this);
-			newView.setImageResource (R.drawable.hello);
+//			ImageView newView = new ImageView (this);
+//			newView.setImageResource (R.drawable.hello);
+//			newView.setId(IDGen.generateViewId());
+//			//            imageNo++ ;
+//			int w = 60;
+//			int h = 60;
+//			int left = 80;
+//			int top = 100;
+//			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+//			mDragLayer.addView (newView, lp);
+//			newView.setOnClickListener(this);
+//			newView.setOnLongClickListener(this);
+//			newView.setOnTouchListener(this);
+//			return true;
+			
+			/* Option Menu for selecting Image */
+			final ImageView newView = new ImageView (this);
+			CharSequence equipment[] = new CharSequence[] {"burrete", "beaker", "testtube"};
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Pick an equipment");
+			builder.setItems(equipment, new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			        // the user clicked on colors[which]
+			    	switch(which)
+			    	{
+			    	case 0:
+			    		newView.setImageResource(R.drawable.burrete);
+			    		break ;
+			    	case 1:
+			    		newView.setImageResource(R.drawable.beaker);
+			    		break ;
+			    	case 2:
+			    		newView.setImageResource(R.drawable.testtube);
+			    		break ;
+			    	default:
+			    		break ;	
+			    	}
+			    }
+			});
+			builder.show();
+
+//			ImageView newView = new ImageView (this);
+//			new LoadImageTask(newView).execute(targetUrl);
+//			newView.setImageResource (R.drawable.hello);
 			newView.setId(IDGen.generateViewId());
 			//            imageNo++ ;
 			int w = 60;
@@ -195,15 +249,20 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			newView.setOnLongClickListener(this);
 			newView.setOnTouchListener(this);
 			return true;
-//		case CHANGE_TOUCH_MODE_MENU_ID:
-//			mLongClickStartsDrag = !mLongClickStartsDrag;
-//			String message = mLongClickStartsDrag ? "Changed touch mode. Drag now starts on long touch (click)." 
-//					: "Changed touch mode. Drag now starts on touch (click).";
-//			Toast.makeText (getApplicationContext(), message, Toast.LENGTH_LONG).show ();
-//			return true;
+
+//			image1 = (ImageView)findViewById(R.id.image1);			   
+//			new LoadImageTask(image1).execute(targetUrl);
+			  
+			  
+			//		case CHANGE_TOUCH_MODE_MENU_ID:
+			//			mLongClickStartsDrag = !mLongClickStartsDrag;
+			//			String message = mLongClickStartsDrag ? "Changed touch mode. Drag now starts on long touch (click)." 
+			//					: "Changed touch mode. Drag now starts on touch (click).";
+			//			Toast.makeText (getApplicationContext(), message, Toast.LENGTH_LONG).show ();
+			//			return true;
 		case PLAY_ANIM:
 			FileInputStream fis = null ;
-			
+
 			try {
 				fis = openFileInput("media") ;
 			} catch (FileNotFoundException e1) {
@@ -226,10 +285,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			return true ;
 		case DELETE_FILE:
 			File file = new File(getFilesDir().getAbsolutePath()+"/media") ;
-//			toast((getFilesDir().getAbsolutePath()+"/media").toString()) ;
+			//			toast((getFilesDir().getAbsolutePath()+"/media").toString()) ;
 			file.delete() ;
 			return true ;
-			
+
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -286,23 +345,23 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		mDragLayer.setDragController(dragController);
 		dragController.addDropTarget (mDragLayer);
 
-		ImageView i1 = (ImageView) findViewById (R.id.Image1);
-		ImageView i2 = (ImageView) findViewById (R.id.Image2);
+//		ImageView i1 = (ImageView) findViewById (R.id.Image1);
+//		ImageView i2 = (ImageView) findViewById (R.id.Image2);
 
-		//    i1.setId(IDGen.generateViewId());
-		//    i2.setId(IDGen.generateViewId());
+//		    i1.setId(IDGen.generateViewId());
+//		    i2.setId(IDGen.generateViewId());
 
 
-		i1.setId(0);
-		i2.setId(1);
+//		i1.setId(0);
+//		i2.setId(1);
 
-		i1.setOnClickListener(this);
-		i1.setOnLongClickListener(this);
-		i1.setOnTouchListener(this);
-
-		i2.setOnClickListener(this);
-		i2.setOnLongClickListener(this);
-		i2.setOnTouchListener(this);
+//		i1.setOnClickListener(this);
+//		i1.setOnLongClickListener(this);
+//		i1.setOnTouchListener(this);
+//
+//		i2.setOnClickListener(this);
+//		i2.setOnLongClickListener(this);
+//		i2.setOnTouchListener(this);
 
 		//    TextView tv = (TextView) findViewById (R.id.Text1);
 		//    tv.setOnLongClickListener(this);
@@ -363,11 +422,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		final ImageView logoFocus = (ImageView)findViewById(imageId) ;
 
-//		final float amountToMoveDown = yFinal - yInitial ;
-//		final float amountToMoveRight = xFinal - xInitial ;
+		//		final float amountToMoveDown = yFinal - yInitial ;
+		//		final float amountToMoveRight = xFinal - xInitial ;
 
-//		Animation anim= new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown); 
-				Animation anim = new TranslateAnimation(0,(xFinal-xInitial),0,(yFinal-yInitial)) ;
+		//		Animation anim= new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown); 
+		Animation anim = new TranslateAnimation(0,(xFinal-xInitial),0,(yFinal-yInitial)) ;
 		anim.setDuration(1000); 
 		//	anim.setFillAfter(true); 
 		//	anim.setFillEnabled(true); 
@@ -384,26 +443,26 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				lp.x = (int) xFinal ;
 				lp.y = (int) yFinal ;
 				logoFocus.setLayoutParams(lp);
-				
-//				nextMove(reader);
+
+				//				nextMove(reader);
 				if(!stepMode)
 				{
-				FileInputStream fis = null ;
-				
-				try {
-					fis = openFileInput("media") ;
-				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					toast("Error: File not found") ;
-					return ;
+					FileInputStream fis = null ;
+
+					try {
+						fis = openFileInput("media") ;
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						toast("Error: File not found") ;
+						return ;
+					}
+
+					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+					nextMove(reader);
 				}
 
-				BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-
-				nextMove(reader);
-				}
-				
 			}
 		});
 		logoFocus.startAnimation(anim);
@@ -431,7 +490,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				initY = Float.parseFloat(RowData[2]) ;
 				finX = Float.parseFloat(RowData[3]) ;
 				finY = Float.parseFloat(RowData[4]) ;
-				
+
 				anim(imageId,initX,initY,finX,finY);
 			}
 		}
@@ -441,6 +500,46 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		{
 			lineNo++ ;
 		}
+	}
+
+	private class LoadImageTask extends AsyncTask<String, Void, Bitmap>{
+
+		ImageView targetImageView;
+
+		LoadImageTask(ImageView iv){
+			targetImageView = iv;
+		}
+
+		@Override
+		protected Bitmap doInBackground(String... params) {
+			Bitmap bm = loadImageFromUrl(params[0]);
+			return bm;
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap result) {
+			targetImageView.setImageBitmap(result);
+		}
+
+	}
+
+	private Bitmap loadImageFromUrl(String targetUrl){
+		Bitmap bm = null;
+
+		try {
+			URL url = new URL(targetUrl);
+			URLConnection connection = url.openConnection();
+			InputStream inputStream = connection.getInputStream();
+			bm = BitmapFactory.decodeStream(inputStream);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return bm;
 	}
 
 } // end class
