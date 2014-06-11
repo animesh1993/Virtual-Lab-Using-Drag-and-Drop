@@ -19,11 +19,17 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.inputmethodservice.Keyboard.Row;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -33,8 +39,11 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
 import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageView.ScaleType;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +75,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	private static final int RESET = Menu.FIRST + 3 ;
 	private static final int PLAY_STEP = Menu.FIRST + 4 ;
 	private static final int DELETE_FILE = Menu.FIRST + 5 ;
+	private static final int SCALE = Menu.FIRST + 6 ;
 
 	/**
 	 */
@@ -73,7 +83,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	private DragController mDragController;   // Object that sends out drag-drop events while a view is being moved.
 	private DragLayer mDragLayer;             // The ViewGroup that supports drag-drop.
-//	private DropSpot mSpot2;                  // The DropSpot that can be turned on and off via the menu.
+	//	private DropSpot mSpot2;                  // The DropSpot that can be turned on and off via the menu.
 	private boolean mLongClickStartsDrag = false;    // If true, it takes a long click to start the drag operation.
 	// Otherwise, only longTouch event starts a drag.
 
@@ -85,7 +95,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	private static boolean stepMode = false ;
 	String targetUrl = "http://goo.gl/qfGTN3";
 
-	public static final boolean Debugging = false;
+	public static final boolean Debugging = true;
 
 	/**
 	 */
@@ -129,6 +139,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		menu.add(0, RESET, 0, "Reset") ;
 		menu.add(0,PLAY_STEP,0,"Step Mode") ;
 		menu.add(0,DELETE_FILE,0,"Delete File") ;
+		menu.add(0,SCALE,0,"Scale and Rotate Mode") ;
+
 		return true;
 	}
 
@@ -152,21 +164,93 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	 * @return boolean - true indicates that the event was handled
 	 */    
 
-	public boolean onLongClick(View v) 
+	public boolean onLongClick(final View v) 
 	{
-		if (mLongClickStartsDrag) {
+		//		if (mLongClickStartsDrag) {
+		//
+		//			//trace ("onLongClick in view: " + v + " touchMode: " + v.isInTouchMode ());
+		//
+		//			// Make sure the drag was started by a long press as opposed to a long click.
+		//			// (Note: I got this from the Workspace object in the Android Launcher code. 
+		//			//  I think it is here to ensure that the device is still in touch mode as we start the drag operation.)
+		//			if (!v.isInTouchMode()) {
+		//				toast ("isInTouchMode returned false. Try touching the view again.");
+		//				return false;
+		//			}        
+		//			return startDrag (v);
+		//		}
+		if (mLongClickStartsDrag) 
+		{
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setTitle("Scaling");
+			alert.setMessage("Enter Scaling or Rotation Value (integer)");
 
-			//trace ("onLongClick in view: " + v + " touchMode: " + v.isInTouchMode ());
+			// Set an EditText view to get user input 
+			final EditText input = new EditText(this);
+			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+			alert.setView(input);
+			alert.setPositiveButton("Scale", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					String value = input.getText().toString();
+					// Do something with value!
+					if(value.length() == 0)
+					{
+						toast("No text entered Error") ;
+						return ;
+					}
 
-			// Make sure the drag was started by a long press as opposed to a long click.
-			// (Note: I got this from the Workspace object in the Android Launcher code. 
-			//  I think it is here to ensure that the device is still in touch mode as we start the drag operation.)
-			if (!v.isInTouchMode()) {
-				toast ("isInTouchMode returned false. Try touching the view again.");
-				return false;
-			}        
-			return startDrag (v);
+					Float scale = Float.parseFloat(value) ;
+					//			  scale = scale/100 ;
+					trace("Scale =  " + scale);
+					scaleRelative(v,scale);
+					//			  	scaleImageAbsolute((ImageView)v,Integer.parseInt(value));
+					//					scaleImageRelative((ImageView)v, scale);
+				}
+			});
+
+			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					// Canceled.
+					//				  scaleImageAbsolute((ImageView)v, 300);
+					//					scaleRelative(v,200);
+					//					Matrix matrix=new Matrix();
+					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
+					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
+					//					((ImageView)v).setImageMatrix(matrix);
+					//					v.setRotation(180);
+				}
+			});
+
+			alert.setNeutralButton("Rotate", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					// Canceled.
+					//				  scaleImageAbsolute((ImageView)v, 300);
+					//					scaleRelative(v,200);
+					//					Matrix matrix=new Matrix();
+					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
+					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
+					//					((ImageView)v).setImageMatrix(matrix);
+					
+					
+					String value = input.getText().toString() ;
+					
+					if(value.length() == 0)
+					{
+						toast("No text entered Error") ;
+						return ;
+					}
+					
+					Float rotate = Float.parseFloat(value) ;
+					v.setRotation(rotate);
+				}
+			}) ;
+
+			alert.show();
+
+			return true ;
 		}
+
+
 
 		// If we get here, return false to indicate that we have not taken care of the event.
 		return false;
@@ -191,94 +275,102 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//			return true;
 		case ADD_OBJECT_MENU_ID:
 			// Add a new object to the DragLayer and see if it can be dragged around.
-//			ImageView newView = new ImageView (this);
-//			newView.setImageResource (R.drawable.hello);
-//			newView.setId(IDGen.generateViewId());
-//			//            imageNo++ ;
-//			int w = 60;
-//			int h = 60;
-//			int left = 80;
-//			int top = 100;
-//			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
-//			mDragLayer.addView (newView, lp);
-//			newView.setOnClickListener(this);
-//			newView.setOnLongClickListener(this);
-//			newView.setOnTouchListener(this);
-//			return true;
-			
+			//			ImageView newView = new ImageView (this);
+			//			newView.setImageResource (R.drawable.hello);
+			//			newView.setId(IDGen.generateViewId());
+			//			//            imageNo++ ;
+			//			int w = 60;
+			//			int h = 60;
+			//			int left = 80;
+			//			int top = 100;
+			//			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+			//			mDragLayer.addView (newView, lp);
+			//			newView.setOnClickListener(this);
+			//			newView.setOnLongClickListener(this);
+			//			newView.setOnTouchListener(this);
+			//			return true;
+
 			/* Option Menu for selecting Image */
 			final ImageView newView = new ImageView (this);
 			CharSequence equipment[] = new CharSequence[] {"burrete", "beaker", "testtube"};
-			
+
 			/* For saving adding image into the csv data file*/
-			
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Pick an equipment");
 			builder.setItems(equipment, new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			        // the user clicked on equipment[which]
-			    	FileOutputStream fos = null;
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// the user clicked on equipment[which]
+					FileOutputStream fos = null;
 					try {
 						fos = openFileOutput("media", MODE_APPEND);
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-			    	try {
+
+					try {
 						fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			    	
-			    	try {
+
+					try {
 						fos.close();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			    	
-			    	switch(which)
-			    	{
-			    	case 0:
-			    		newView.setImageResource(R.drawable.burrete);
-			    		break ;
-			    	case 1:
-			    		newView.setImageResource(R.drawable.beaker);
-			    		break ;
-			    	case 2:
-			    		newView.setImageResource(R.drawable.testtube);
-			    		break ;
-			    	default:
-			    		break ;	
-			    	}
-			    }
+
+					switch(which)
+					{
+					case 0:
+						newView.setImageResource(R.drawable.burrete);
+						break ;
+					case 1:
+						newView.setImageResource(R.drawable.beaker);
+						break ;
+					case 2:
+						newView.setImageResource(R.drawable.testtube);
+						break ;
+					default:
+						break ;	
+					}
+				}
 			});
 			builder.show();
 
-//			ImageView newView = new ImageView (this);
-//			new LoadImageTask(newView).execute(targetUrl);
-//			newView.setImageResource (R.drawable.hello);
+			//			ImageView newView = new ImageView (this);
+			//			new LoadImageTask(newView).execute(targetUrl);
+			//			newView.setImageResource (R.drawable.hello);
 			newView.setId(IDGen.generateViewId());
 			//            imageNo++ ;
 			int w = 60;
 			int h = 60;
-			int left = 80;
-			int top = 100;
+			int left = 60;
+			int top = 60;
 			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
 			mDragLayer.addView (newView, lp);
 			newView.setOnClickListener(this);
 			newView.setOnLongClickListener(this);
 			newView.setOnTouchListener(this);
-            
+
+			//			lp.height = 100 ;
+			//			lp.width = 100 ;
+
+			//			scaleRelative(newView,200);
+
+			//			scaleImageAbsolute(newView, 100);
+
+
 			return true;
 
-//			image1 = (ImageView)findViewById(R.id.image1);			   
-//			new LoadImageTask(image1).execute(targetUrl);
-			  
-			  
+			//			image1 = (ImageView)findViewById(R.id.image1);			   
+			//			new LoadImageTask(image1).execute(targetUrl);
+
+
 			//		case CHANGE_TOUCH_MODE_MENU_ID:
 			//			mLongClickStartsDrag = !mLongClickStartsDrag;
 			//			String message = mLongClickStartsDrag ? "Changed touch mode. Drag now starts on long touch (click)." 
@@ -312,6 +404,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			File file = new File(getFilesDir().getAbsolutePath()+"/media") ;
 			//			toast((getFilesDir().getAbsolutePath()+"/media").toString()) ;
 			file.delete() ;
+			return true ;
+		case SCALE:
+			mLongClickStartsDrag = !mLongClickStartsDrag ;
 			return true ;
 
 		}
@@ -370,23 +465,23 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		mDragLayer.setDragController(dragController);
 		dragController.addDropTarget (mDragLayer);
 
-//		ImageView i1 = (ImageView) findViewById (R.id.Image1);
-//		ImageView i2 = (ImageView) findViewById (R.id.Image2);
+		//		ImageView i1 = (ImageView) findViewById (R.id.Image1);
+		//		ImageView i2 = (ImageView) findViewById (R.id.Image2);
 
-//		    i1.setId(IDGen.generateViewId());
-//		    i2.setId(IDGen.generateViewId());
+		//		    i1.setId(IDGen.generateViewId());
+		//		    i2.setId(IDGen.generateViewId());
 
 
-//		i1.setId(0);
-//		i2.setId(1);
+		//		i1.setId(0);
+		//		i2.setId(1);
 
-//		i1.setOnClickListener(this);
-//		i1.setOnLongClickListener(this);
-//		i1.setOnTouchListener(this);
-//
-//		i2.setOnClickListener(this);
-//		i2.setOnLongClickListener(this);
-//		i2.setOnTouchListener(this);
+		//		i1.setOnClickListener(this);
+		//		i1.setOnLongClickListener(this);
+		//		i1.setOnTouchListener(this);
+		//
+		//		i2.setOnClickListener(this);
+		//		i2.setOnLongClickListener(this);
+		//		i2.setOnTouchListener(this);
 
 		//    TextView tv = (TextView) findViewById (R.id.Text1);
 		//    tv.setOnLongClickListener(this);
@@ -484,8 +579,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					}
 
 					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-					char moveRead = nextMove(reader)  ;
-					
+					nextMove(reader)  ;
+
 				}
 
 			}
@@ -519,20 +614,20 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					imageId = Integer.parseInt(RowData[2]) ;
 					ImageView newView = new ImageView (this);
 					switch(imageAdded)
-			    	{
-			    	case 0:
-			    		newView.setImageResource(R.drawable.burrete);
-			    		break ;
-			    	case 1:
-			    		newView.setImageResource(R.drawable.beaker);
-			    		break ;
-			    	case 2:
-			    		newView.setImageResource(R.drawable.testtube);
-			    		break ;
-			    	default:
-			    		break ;	
-			    	}
-					
+					{
+					case 0:
+						newView.setImageResource(R.drawable.burrete);
+						break ;
+					case 1:
+						newView.setImageResource(R.drawable.beaker);
+						break ;
+					case 2:
+						newView.setImageResource(R.drawable.testtube);
+						break ;
+					default:
+						break ;	
+					}
+
 					newView.setId(imageId);
 					int w = 60;
 					int h = 60;
@@ -543,13 +638,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					newView.setOnClickListener(this);
 					newView.setOnLongClickListener(this);
 					newView.setOnTouchListener(this);
-//					nextMove(reader) ;
-					
+					//					nextMove(reader) ;
+
 					caseRead = 'a' ;
 					break ;
-					
+
 				case 'm':
-					
+
 					imageId = Integer.parseInt(RowData[1]);
 					initX = Float.parseFloat(RowData[2]);
 					initY = Float.parseFloat(RowData[3]) ;
@@ -559,7 +654,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					caseRead = 'm' ;
 					break ;
 				}
-				
+
 			}
 		}
 		catch (IOException ex) {
@@ -568,12 +663,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		{
 			lineNo++ ;
 		}
-		
-//		if(caseRead == 'a')
-//		{
-//			nextMove(reader) ;
-//		}
-		
+
+		//		if(caseRead == 'a')
+		//		{
+		//			nextMove(reader) ;
+		//		}
+
 		return caseRead; 
 	}
 
@@ -617,4 +712,100 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		return bm;
 	}
 
+	private void scaleImageAbsolute(ImageView view, int boundBoxInDp)
+	{
+		// Get the ImageView and its bitmap
+		Drawable drawing = view.getDrawable();
+		Bitmap bitmap = ((BitmapDrawable)drawing).getBitmap();
+
+		// Get current dimensions
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+
+		trace("before width "+ width) ;
+		trace("before height "+ height) ;
+		// Determine how much to scale: the dimension requiring less scaling is
+		// closer to the its side. This way the image always stays inside your
+		// bounding box AND either x/y axis touches it.
+		float xScale = ((float) boundBoxInDp) / width;
+		float yScale = ((float) boundBoxInDp) / height;
+		float scale = (xScale <= yScale) ? xScale : yScale;
+
+		trace("Scale inside function = " + scale+"") ;
+		// Create a matrix for the scaling and add the scaling data
+		Matrix matrix = new Matrix();
+		matrix.postScale(scale, scale);
+
+		// Create a new bitmap and convert it to a format understood by the ImageView
+		Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+		@SuppressWarnings("deprecation")
+		BitmapDrawable result = new BitmapDrawable(scaledBitmap);
+		width = scaledBitmap.getWidth();
+		height = scaledBitmap.getHeight();
+
+		// Apply the scaled bitmap
+		view.setImageDrawable(result);
+
+		// Now change ImageView's dimensions to match the scaled image
+		DragLayer.LayoutParams params = (DragLayer.LayoutParams) view.getLayoutParams();
+		params.width = width;
+		params.height = height;
+		view.setLayoutParams(params);
+	}
+
+	private void scaleImageRelative(ImageView view, float scale)
+	{
+		// Get the ImageView and its bitmap
+		Drawable drawing = view.getDrawable();
+		Bitmap bitmap = ((BitmapDrawable)drawing).getBitmap();
+
+		// Get current dimensions
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+		//
+		//	    // Determine how much to scale: the dimension requiring less scaling is
+		//	    // closer to the its side. This way the image always stays inside your
+		//	    // bounding box AND either x/y axis touches it.
+		//	    float xScale = ((float) boundBoxInDp) / width;
+		//	    float yScale = ((float) boundBoxInDp) / height;
+		//	    float scale = (xScale <= yScale) ? xScale : yScale;
+
+		// Create a matrix for the scaling and add the scaling data
+		Matrix matrix = new Matrix();
+		matrix.postScale(scale, scale);
+
+		// Create a new bitmap and convert it to a format understood by the ImageView
+		Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+		@SuppressWarnings("deprecation")
+		BitmapDrawable result = new BitmapDrawable(scaledBitmap);
+		width = scaledBitmap.getWidth();
+		height = scaledBitmap.getHeight();
+
+		// Apply the scaled bitmap
+		view.setImageDrawable(result);
+
+		// Now change ImageView's dimensions to match the scaled image
+		DragLayer.LayoutParams params = (DragLayer.LayoutParams) view.getLayoutParams();
+		params.width = width;
+		params.height = height;
+		view.setLayoutParams(params);
+	}
+
+	private int dpToPx(int dp)
+	{
+		float density = getApplicationContext().getResources().getDisplayMetrics().density;
+		return Math.round((float)dp * density);
+	}
+
+	private void scaleRelative(View v,float scale)
+	{
+		float scaleDec = scale / 100 ;
+		//				trace("scaleDec" + scaleDec) ;
+		//				trace("getLayoutHeight before"+v.getLayoutParams().height) ;
+		v.getLayoutParams().height *= scaleDec ;
+		//				trace("getLayoutHeight after"+v.getLayoutParams().height) ;
+		v.getLayoutParams().width *= scaleDec ;
+		v.setLayoutParams(v.getLayoutParams());
+
+	}
 } // end class
