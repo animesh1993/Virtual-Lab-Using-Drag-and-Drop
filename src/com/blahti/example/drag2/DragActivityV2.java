@@ -203,6 +203,29 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					//			  scale = scale/100 ;
 					trace("Scale =  " + scale);
 					scaleRelative(v,scale);
+
+					FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.write(("s" + "," + v.getId() + "," + scale + "\n").getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 					//			  	scaleImageAbsolute((ImageView)v,Integer.parseInt(value));
 					//					scaleImageRelative((ImageView)v, scale);
 				}
@@ -230,18 +253,40 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
 					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
 					//					((ImageView)v).setImageMatrix(matrix);
-					
-					
+
+
 					String value = input.getText().toString() ;
-					
+
 					if(value.length() == 0)
 					{
 						toast("No text entered Error") ;
 						return ;
 					}
-					
+
 					Float rotate = Float.parseFloat(value) ;
 					v.setRotation(rotate);
+					
+					FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.write(("r" + "," + v.getId() + "," + rotate + "\n").getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}) ;
 
@@ -595,6 +640,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		float initX, finX, initY, finY ;
 		String[] RowData = null;
 		int imageAdded = 0 ;
+		float rotate = 0 ;
+		float scale = 0;
 		int i = 1 ;
 		try {
 			String line;
@@ -653,6 +700,30 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					anim(imageId,initX,initY,finX,finY);
 					caseRead = 'm' ;
 					break ;
+					
+				case 'r':
+					
+					imageId = Integer.parseInt(RowData[1]) ;
+					rotate = Float.parseFloat(RowData[2]) ;
+					
+					((ImageView)findViewById(imageId)).setRotation(rotate);
+					break ;
+					
+				case 's':
+					
+					imageId = Integer.parseInt(RowData[1]) ;
+					scale = Float.parseFloat(RowData[2]) ;
+					
+					float scaleDec = scale / 100 ;
+					//				trace("scaleDec" + scaleDec) ;
+					//				trace("getLayoutHeight before"+v.getLayoutParams().height) ;
+					((ImageView)findViewById(imageId)).getLayoutParams().height *= scaleDec ;
+					//				trace("getLayoutHeight after"+v.getLayoutParams().height) ;
+					((ImageView)findViewById(imageId)).getLayoutParams().width *= scaleDec ;
+					((ImageView)findViewById(imageId)).setLayoutParams(((ImageView)findViewById(imageId)).getLayoutParams());
+					
+					
+					
 				}
 
 			}
