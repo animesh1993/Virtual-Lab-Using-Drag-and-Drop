@@ -20,7 +20,12 @@
 package com.blahti.example.drag2;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -32,6 +37,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
@@ -163,20 +169,28 @@ public class DragController {
 
         mOriginator = v;
 
-        Bitmap b = getViewBitmap(v);
+        Bitmap b = getViewBitmap(v);        
+        
 
         if (b == null) {
             // out of memory?
             return;
         }
+        
+//        Canvas canvas = new Canvas(b);
+//        Matrix matrix = new Matrix();
+//        matrix.setRotate(v.getRotation(),v.getWidth()/2,v.getHeight()/2);
+//        canvas.drawBitmap(b, matrix, new Paint());
+//        b.recycle();
+        
+        b = RotateBitmap(b, v.getRotation()) ;
 
         int[] loc = mCoordinatesTemp;
         v.getLocationOnScreen(loc);
         int screenX = loc[0];
         int screenY = loc[1];
         
-        startDrag(b, screenX, screenY, 0, 0, b.getWidth(), b.getHeight(),
-                source, dragInfo, dragAction);
+        startDrag(b, screenX, screenY, 0, 0, b.getWidth(), b.getHeight(),source, dragInfo, dragAction);
 
         b.recycle();
 
@@ -261,7 +275,6 @@ public class DragController {
         }
 
         Bitmap bitmap = Bitmap.createBitmap(cacheBitmap);
-
         // Restore the view
         v.destroyDrawingCache();
         v.setWillNotCacheDrawing(willNotCache);
@@ -586,6 +599,13 @@ public class DragController {
      */
     public void removeDropTarget(DropTarget target) {
         mDropTargets.remove(target);
+    }
+    
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+          Matrix matrix = new Matrix();
+          matrix.postRotate(angle);
+          return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
 }

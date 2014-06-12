@@ -17,6 +17,16 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:text="@string/InfoData" />
+
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical" />
+
     </RelativeLayout>
 
 </com.blahti.example.drag2.DragLayer>

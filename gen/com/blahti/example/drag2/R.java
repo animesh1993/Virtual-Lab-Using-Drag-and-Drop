@@ -59,15 +59,19 @@ public final class R {
         public static final int testtube=0x7f020008;
     }
     public static final class id {
-        public static final int Image1=0x7f070003;
-        public static final int Image2=0x7f070004;
-        public static final int Text1=0x7f070002;
-        public static final int drag_layer=0x7f070000;
-        public static final int textView1=0x7f070001;
+        public static final int Image1=0x7f070006;
+        public static final int Image2=0x7f070007;
+        public static final int Text1=0x7f070005;
+        public static final int drag_layer=0x7f070002;
+        public static final int img=0x7f070000;
+        public static final int list=0x7f070004;
+        public static final int textView1=0x7f070003;
+        public static final int txt=0x7f070001;
     }
     public static final class layout {
-        public static final int main=0x7f030000;
-        public static final int main_v1=0x7f030001;
+        public static final int list_single=0x7f030000;
+        public static final int main=0x7f030001;
+        public static final int main_v1=0x7f030002;
     }
     public static final class string {
         public static final int InfoData=0x7f060002;

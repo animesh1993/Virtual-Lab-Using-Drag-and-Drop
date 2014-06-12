@@ -27,6 +27,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.inputmethodservice.Keyboard.Row;
 import android.media.Image;
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
@@ -36,14 +37,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView.ScaleType;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -97,6 +103,21 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	public static final boolean Debugging = true;
 
+
+	ListView list;
+	String[] web = {
+			"Burrete",
+			"Beaker",
+			"TestTube",
+			"Cancel"
+	} ;
+	Integer[] imageId = {
+			R.drawable.burrete,
+			R.drawable.beaker,
+			R.drawable.testtube,
+			R.drawable.icon
+	};
+
 	/**
 	 */
 	// Methods
@@ -113,9 +134,83 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	{
 		super.onCreate(savedInstanceState);
 		mDragController = new DragController(this);
+		final Object objectDef = this ;
 
 		setContentView(R.layout.main);
 		setupViews ();
+
+		CustomList adapter = new
+				CustomList(DragActivityV2.this, web, imageId);
+		list=(ListView)findViewById(R.id.list);
+		list.setAdapter(adapter);
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int which, long id) {
+				
+				list.bringToFront();
+				if(which==3)
+				{
+					list.setVisibility(View.INVISIBLE);
+					return ;
+				}
+					Toast.makeText(DragActivityV2.this, "You Clicked at " +web[+ which], Toast.LENGTH_SHORT).show();
+				final ImageView newView = new ImageView (getApplicationContext());
+//				newView.setImageResource(R.drawable.beaker);
+				
+				FileOutputStream fos = null;
+				try {
+					fos = openFileOutput("media", MODE_APPEND);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				try {
+					fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				try {
+					fos.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				switch(which)
+				{
+				case 0:
+					newView.setImageResource(R.drawable.burrete);
+					break ;
+				case 1:
+					newView.setImageResource(R.drawable.beaker);
+					break ;
+				case 2:
+					newView.setImageResource(R.drawable.testtube);
+					break ;
+				default:
+					break ;	
+				}
+				
+				newView.setId(IDGen.generateViewId());
+				
+				int w = 60;
+				int h = 60;
+				int left = 80;
+				int top = 100;
+				DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+				mDragLayer.addView (newView, lp);
+				newView.setOnClickListener((OnClickListener) objectDef);
+				newView.setOnLongClickListener((OnLongClickListener) objectDef);
+				newView.setOnTouchListener((OnTouchListener) objectDef);
+				
+//				list.setVisibility(View.INVISIBLE);
+			}
+		});
+		list.setVisibility(View.INVISIBLE);
 
 		dragInfo = (TextView) findViewById(R.id.textView1);
 		dragInfo.setText("Data");
@@ -265,7 +360,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 					Float rotate = Float.parseFloat(value) ;
 					v.setRotation(rotate);
-					
+
 					FileOutputStream fos = null;
 					try {
 						fos = openFileOutput("media", MODE_APPEND);
@@ -319,6 +414,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//			if (mSpot2 != null) mSpot2.setDragLayer (null);
 		//			return true;
 		case ADD_OBJECT_MENU_ID:
+
+			(findViewById(R.id.list)).setVisibility(View.VISIBLE);
+			return true ;
 			// Add a new object to the DragLayer and see if it can be dragged around.
 			//			ImageView newView = new ImageView (this);
 			//			newView.setImageResource (R.drawable.hello);
@@ -336,81 +434,81 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//			return true;
 
 			/* Option Menu for selecting Image */
-			final ImageView newView = new ImageView (this);
-			CharSequence equipment[] = new CharSequence[] {"burrete", "beaker", "testtube"};
-
-			/* For saving adding image into the csv data file*/
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Pick an equipment");
-			builder.setItems(equipment, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// the user clicked on equipment[which]
-					FileOutputStream fos = null;
-					try {
-						fos = openFileOutput("media", MODE_APPEND);
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					try {
-						fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					try {
-						fos.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					switch(which)
-					{
-					case 0:
-						newView.setImageResource(R.drawable.burrete);
-						break ;
-					case 1:
-						newView.setImageResource(R.drawable.beaker);
-						break ;
-					case 2:
-						newView.setImageResource(R.drawable.testtube);
-						break ;
-					default:
-						break ;	
-					}
-				}
-			});
-			builder.show();
-
-			//			ImageView newView = new ImageView (this);
-			//			new LoadImageTask(newView).execute(targetUrl);
-			//			newView.setImageResource (R.drawable.hello);
-			newView.setId(IDGen.generateViewId());
-			//            imageNo++ ;
-			int w = 60;
-			int h = 60;
-			int left = 60;
-			int top = 60;
-			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
-			mDragLayer.addView (newView, lp);
-			newView.setOnClickListener(this);
-			newView.setOnLongClickListener(this);
-			newView.setOnTouchListener(this);
-
-			//			lp.height = 100 ;
-			//			lp.width = 100 ;
-
-			//			scaleRelative(newView,200);
-
-			//			scaleImageAbsolute(newView, 100);
-
-
-			return true;
+			//			final ImageView newView = new ImageView (this);
+			//			CharSequence equipment[] = new CharSequence[] {"burrete", "beaker", "testtube"};
+			//
+			//			/* For saving adding image into the csv data file*/
+			//
+			//			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			//			builder.setTitle("Pick an equipment");
+			//			builder.setItems(equipment, new DialogInterface.OnClickListener() {
+			//				@Override
+			//				public void onClick(DialogInterface dialog, int which) {
+			//					// the user clicked on equipment[which]
+			//					FileOutputStream fos = null;
+			//					try {
+			//						fos = openFileOutput("media", MODE_APPEND);
+			//					} catch (FileNotFoundException e) {
+			//						// TODO Auto-generated catch block
+			//						e.printStackTrace();
+			//					}
+			//
+			//					try {
+			//						fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
+			//					} catch (IOException e) {
+			//						// TODO Auto-generated catch block
+			//						e.printStackTrace();
+			//					}
+			//
+			//					try {
+			//						fos.close();
+			//					} catch (IOException e) {
+			//						// TODO Auto-generated catch block
+			//						e.printStackTrace();
+			//					}
+			//
+			//					switch(which)
+			//					{
+			//					case 0:
+			//						newView.setImageResource(R.drawable.burrete);
+			//						break ;
+			//					case 1:
+			//						newView.setImageResource(R.drawable.beaker);
+			//						break ;
+			//					case 2:
+			//						newView.setImageResource(R.drawable.testtube);
+			//						break ;
+			//					default:
+			//						break ;	
+			//					}
+			//				}
+			//			});
+			//			builder.show();
+			//
+			//			//			ImageView newView = new ImageView (this);
+			//			//			new LoadImageTask(newView).execute(targetUrl);
+			//			//			newView.setImageResource (R.drawable.hello);
+			//			newView.setId(IDGen.generateViewId());
+			//			//            imageNo++ ;
+			//			int w = 60;
+			//			int h = 60;
+			//			int left = 60;
+			//			int top = 60;
+			//			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+			//			mDragLayer.addView (newView, lp);
+			//			newView.setOnClickListener(this);
+			//			newView.setOnLongClickListener(this);
+			//			newView.setOnTouchListener(this);
+			//
+			//			//			lp.height = 100 ;
+			//			//			lp.width = 100 ;
+			//
+			//			//			scaleRelative(newView,200);
+			//
+			//			//			scaleImageAbsolute(newView, 100);
+			//
+			//
+			//			return true;
 
 			//			image1 = (ImageView)findViewById(R.id.image1);			   
 			//			new LoadImageTask(image1).execute(targetUrl);
@@ -510,7 +608,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		mDragLayer.setDragController(dragController);
 		dragController.addDropTarget (mDragLayer);
 
-		//		ImageView i1 = (ImageView) findViewById (R.id.Image1);
+		//				ImageView i1 = (ImageView) findViewById (R.id.Image1);
 		//		ImageView i2 = (ImageView) findViewById (R.id.Image2);
 
 		//		    i1.setId(IDGen.generateViewId());
@@ -520,7 +618,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//		i1.setId(0);
 		//		i2.setId(1);
 
-		//		i1.setOnClickListener(this);
+		//				i1.setOnClickListener(this);
 		//		i1.setOnLongClickListener(this);
 		//		i1.setOnTouchListener(this);
 		//
@@ -700,20 +798,20 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					anim(imageId,initX,initY,finX,finY);
 					caseRead = 'm' ;
 					break ;
-					
+
 				case 'r':
-					
+
 					imageId = Integer.parseInt(RowData[1]) ;
 					rotate = Float.parseFloat(RowData[2]) ;
-					
+
 					((ImageView)findViewById(imageId)).setRotation(rotate);
 					break ;
-					
+
 				case 's':
-					
+
 					imageId = Integer.parseInt(RowData[1]) ;
 					scale = Float.parseFloat(RowData[2]) ;
-					
+
 					float scaleDec = scale / 100 ;
 					//				trace("scaleDec" + scaleDec) ;
 					//				trace("getLayoutHeight before"+v.getLayoutParams().height) ;
@@ -721,9 +819,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					//				trace("getLayoutHeight after"+v.getLayoutParams().height) ;
 					((ImageView)findViewById(imageId)).getLayoutParams().width *= scaleDec ;
 					((ImageView)findViewById(imageId)).setLayoutParams(((ImageView)findViewById(imageId)).getLayoutParams());
-					
-					
-					
+
+
+
 				}
 
 			}
