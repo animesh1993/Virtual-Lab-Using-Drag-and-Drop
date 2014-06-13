@@ -53,6 +53,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 /**
  * This activity presents a screen on which images can be added and moved around.
@@ -75,13 +76,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	//	private static final int ENABLE_S2_MENU_ID = Menu.FIRST;
 	//	private static final int DISABLE_S2_MENU_ID = Menu.FIRST + 1;
-	private static final int ADD_OBJECT_MENU_ID = Menu.FIRST + 1;
+//	private static final int ADD_OBJECT_MENU_ID = Menu.FIRST + 1;
 	//	private static final int CHANGE_TOUCH_MODE_MENU_ID = Menu.FIRST + 3;
-	private static final int PLAY_ANIM = Menu.FIRST + 2 ;
-	private static final int RESET = Menu.FIRST + 3 ;
-	private static final int PLAY_STEP = Menu.FIRST + 4 ;
-	private static final int DELETE_FILE = Menu.FIRST + 5 ;
-	private static final int SCALE = Menu.FIRST + 6 ;
+//	private static final int PLAY_ANIM = Menu.FIRST + 2 ;
+//	private static final int RESET = Menu.FIRST + 3 ;
+	private static final int PLAY_STEP = Menu.FIRST + 1 ;
+	private static final int DELETE_FILE = Menu.FIRST + 2 ;
+	private static final int SHOW_BUTTONS = Menu.FIRST + 3 ;
+//	private static final int SCALE = Menu.FIRST + 6 ;
 
 	/**
 	 */
@@ -100,12 +102,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	private static int lineNo = 1 ;
 	private static boolean stepMode = false ;
 	String targetUrl = "http://goo.gl/qfGTN3";
+	private static boolean buttonsVisible = false ;
 
 	public static final boolean Debugging = true;
 
 
 	ListView list;
-	String[] web = {
+	String[] equipmentItems = {
 			"Burrete",
 			"Beaker",
 			"TestTube",
@@ -140,7 +143,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		setupViews ();
 
 		CustomList adapter = new
-				CustomList(DragActivityV2.this, web, imageId);
+				CustomList(DragActivityV2.this, equipmentItems, imageId);
 		list=(ListView)findViewById(R.id.list);
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -154,7 +157,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					list.setVisibility(View.INVISIBLE);
 					return ;
 				}
-					Toast.makeText(DragActivityV2.this, "You Clicked at " +web[+ which], Toast.LENGTH_SHORT).show();
+					Toast.makeText(DragActivityV2.this, "You Clicked at " +equipmentItems[+ which], Toast.LENGTH_SHORT).show();
 				final ImageView newView = new ImageView (getApplicationContext());
 //				newView.setImageResource(R.drawable.beaker);
 
@@ -211,6 +214,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			}
 		});
 		list.setVisibility(View.INVISIBLE);
+		
+		findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
+		findViewById(R.id.modeButton).setVisibility(View.INVISIBLE);
+		findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
+		findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
+		
+		buttonsVisible = false ;
 
 		dragInfo = (TextView) findViewById(R.id.textView1);
 		dragInfo.setText("Data");
@@ -228,13 +238,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		//		menu.add(0, ENABLE_S2_MENU_ID, 0, "Enable Spot2").setShortcut('1', 'c');
 		//		menu.add(0, DISABLE_S2_MENU_ID, 0, "Disable Spot2").setShortcut('2', 'c');
-		menu.add(0, ADD_OBJECT_MENU_ID, 0, "Add View").setShortcut('9', 'z');
+//		menu.add(0, ADD_OBJECT_MENU_ID, 0, "Add View").setShortcut('9', 'z');
 		//		menu.add (0, CHANGE_TOUCH_MODE_MENU_ID, 0, "Change Touch Mode");
-		menu.add(0, PLAY_ANIM, 0, "Play Animation") ;
-		menu.add(0, RESET, 0, "Reset") ;
+//		menu.add(0, PLAY_ANIM, 0, "Play Animation") ;
+//		menu.add(0, RESET, 0, "Reset") ;
 		menu.add(0,PLAY_STEP,0,"Step Mode") ;
 		menu.add(0,DELETE_FILE,0,"Delete File") ;
-		menu.add(0,SCALE,0,"Scale and Rotate Mode") ;
+		menu.add(0,SHOW_BUTTONS,0,"Show/Hide Buttons") ;
+//		menu.add(0,SCALE,0,"Scale and Rotate Mode") ;
 
 		return true;
 	}
@@ -413,10 +424,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//		case DISABLE_S2_MENU_ID:
 		//			if (mSpot2 != null) mSpot2.setDragLayer (null);
 		//			return true;
-		case ADD_OBJECT_MENU_ID:
-
-			(findViewById(R.id.list)).setVisibility(View.VISIBLE);
-			return true ;
+//		case ADD_OBJECT_MENU_ID:
+//
+//			(findViewById(R.id.list)).setVisibility(View.VISIBLE);
+//			return true ;
 			// Add a new object to the DragLayer and see if it can be dragged around.
 			//			ImageView newView = new ImageView (this);
 			//			newView.setImageResource (R.drawable.hello);
@@ -520,26 +531,26 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//					: "Changed touch mode. Drag now starts on touch (click).";
 			//			Toast.makeText (getApplicationContext(), message, Toast.LENGTH_LONG).show ();
 			//			return true;
-		case PLAY_ANIM:
-			FileInputStream fis = null ;
-
-			try {
-				fis = openFileInput("media") ;
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				toast("Error: File Not Found") ;
-				return true ;
-			}
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-
-			nextMove(reader);
-			return true ;
-		case RESET:
-			onCreate(null);
-			lineNo = 1 ;
-			return true ;
+//		case PLAY_ANIM:
+//			FileInputStream fis = null ;
+//
+//			try {
+//				fis = openFileInput("media") ;
+//			} catch (FileNotFoundException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//				toast("Error: File Not Found") ;
+//				return true ;
+//			}
+//
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+//
+//			nextMove(reader);
+//			return true ;
+//		case RESET:
+//			onCreate(null);
+//			lineNo = 1 ;
+//			return true ;
 		case PLAY_STEP:
 			stepMode = !stepMode ;
 			return true ;
@@ -548,10 +559,25 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//			toast((getFilesDir().getAbsolutePath()+"/media").toString()) ;
 			file.delete() ;
 			return true ;
-		case SCALE:
-			mLongClickStartsDrag = !mLongClickStartsDrag ;
+//		case SCALE:
+//			mLongClickStartsDrag = !mLongClickStartsDrag ;
+//			return true ;
+		case SHOW_BUTTONS:
+			if(buttonsVisible)
+			{
+				findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.modeButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
+			}
+			else
+			{
+				findViewById(R.id.addButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.modeButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.playButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.resetButton).setVisibility(View.VISIBLE);
+			}
 			return true ;
-
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -976,5 +1002,44 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		v.getLayoutParams().width *= scaleDec ;
 		v.setLayoutParams(v.getLayoutParams());
 
+	}
+
+	public void playBack(View v)
+	{
+		FileInputStream fis = null ;
+
+		try {
+			fis = openFileInput("media") ;
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			toast("Error: File Not Found") ;
+			return ;
+		}
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+		nextMove(reader);
+	}
+	
+	public void reset(View v)
+	{
+		onCreate(null);
+		lineNo = 1 ;
+	}
+	
+	public void scaleRotateToggle(View v)
+	{
+		boolean on = ((ToggleButton) v).isChecked();
+		
+		if(on)
+			mLongClickStartsDrag = true;
+		else
+			mLongClickStartsDrag = false ;
+	}
+
+	public void addObject(View v)
+	{
+		(findViewById(R.id.list)).setVisibility(View.VISIBLE);
 	}
 } // end class
