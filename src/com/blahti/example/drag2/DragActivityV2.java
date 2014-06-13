@@ -157,6 +157,23 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					Toast.makeText(DragActivityV2.this, "You Clicked at " +web[+ which], Toast.LENGTH_SHORT).show();
 				final ImageView newView = new ImageView (getApplicationContext());
 //				newView.setImageResource(R.drawable.beaker);
+
+				switch(which)
+				{
+				case 0:
+					newView.setImageResource(R.drawable.burrete);
+					break ;
+				case 1:
+					newView.setImageResource(R.drawable.beaker);
+					break ;
+				case 2:
+					newView.setImageResource(R.drawable.testtube);
+					break ;
+				default:
+					break ;	
+				}
+				
+				newView.setId(IDGen.generateViewId());
 				
 				FileOutputStream fos = null;
 				try {
@@ -179,23 +196,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-				switch(which)
-				{
-				case 0:
-					newView.setImageResource(R.drawable.burrete);
-					break ;
-				case 1:
-					newView.setImageResource(R.drawable.beaker);
-					break ;
-				case 2:
-					newView.setImageResource(R.drawable.testtube);
-					break ;
-				default:
-					break ;	
-				}
-				
-				newView.setId(IDGen.generateViewId());
 				
 				int w = 60;
 				int h = 60;
@@ -704,7 +704,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 				MyAbsoluteLayout.LayoutParams lp = (MyAbsoluteLayout.LayoutParams) logoFocus.getLayoutParams();
 				lp.x = (int) xFinal ;
-				lp.y = (int) yFinal ;
+				lp.y = (int) (yFinal-40) ;
 				logoFocus.setLayoutParams(lp);
 
 				//				nextMove(reader);
