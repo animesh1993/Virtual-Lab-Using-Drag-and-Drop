@@ -1309,6 +1309,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		currentTouchMode = TouchMode.MOVE ;
 		ghostMode = false ;
 		studentMode = false ;
+		
+		if(studentMode)
+			setTitle("Virtual Labs - Student Mode");
+		else
+			setTitle("Virtual Labs - Teacher/Admin Mode");
+		
 	}
 
 	public void addObject(View v)
