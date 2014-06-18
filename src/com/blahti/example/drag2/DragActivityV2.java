@@ -13,8 +13,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.Buffer;
 
-import com.blahti.example.drag2.R;
+import android.widget.SeekBar;
 
+import com.blahti.example.drag2.R;
+import com.blahti.example.drag2.SeekArc.OnSeekArcChangeListener;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -25,6 +29,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.display.DisplayManager;
 import android.inputmethodservice.Keyboard.Row;
 import android.media.Image;
 import android.opengl.Visibility;
@@ -32,6 +37,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,6 +56,8 @@ import android.widget.ImageView.ScaleType;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,6 +73,7 @@ import android.widget.ToggleButton;
  * 
  */
 
+@SuppressLint("ResourceAsColor")
 public class DragActivityV2 extends Activity 
 implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 {
@@ -76,14 +85,17 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	//	private static final int ENABLE_S2_MENU_ID = Menu.FIRST;
 	//	private static final int DISABLE_S2_MENU_ID = Menu.FIRST + 1;
-//	private static final int ADD_OBJECT_MENU_ID = Menu.FIRST + 1;
+	//	private static final int ADD_OBJECT_MENU_ID = Menu.FIRST + 1;
 	//	private static final int CHANGE_TOUCH_MODE_MENU_ID = Menu.FIRST + 3;
-//	private static final int PLAY_ANIM = Menu.FIRST + 2 ;
-//	private static final int RESET = Menu.FIRST + 3 ;
-	private static final int PLAY_STEP = Menu.FIRST + 1 ;
-	private static final int DELETE_FILE = Menu.FIRST + 2 ;
-	private static final int SHOW_BUTTONS = Menu.FIRST + 3 ;
-//	private static final int SCALE = Menu.FIRST + 6 ;
+	//	private static final int PLAY_ANIM = Menu.FIRST + 2 ;
+	//	private static final int RESET = Menu.FIRST + 3 ;
+	//	private static final int PLAY_STEP = Menu.FIRST + 1 ;
+	private static final int DELETE_FILE = Menu.FIRST + 1 ;
+	private static final int SHOW_BUTTONS = Menu.FIRST + 2 ;
+	private static final int ADMIN_MODE = Menu.FIRST + 3 ;
+	//	private static final int SCALE = Menu.FIRST + 6 ;
+
+	private DisplayMetrics screenMetrics = new DisplayMetrics();
 
 	/**
 	 */
@@ -105,7 +117,18 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	private static boolean buttonsVisible = false ;
 
 	public static final boolean Debugging = true;
+	View objectSelectedForScaleRotate = null ;
+	public static boolean ghostMode = false ;
+	public static boolean studentMode = false ;
 
+	public enum TouchMode
+	{
+		MOVE,
+		SCALE,
+		ROTATE
+	}
+
+	public TouchMode currentTouchMode  = TouchMode.MOVE ;
 
 	ListView list;
 	String[] equipmentItems = {
@@ -118,7 +141,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			R.drawable.burrete,
 			R.drawable.beaker,
 			R.drawable.testtube,
-			R.drawable.icon
+			R.drawable.cancel_icon
 	};
 
 	/**
@@ -141,25 +164,26 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		setContentView(R.layout.main);
 		setupViews ();
+		getWindowManager().getDefaultDisplay().getMetrics(screenMetrics);
 
-		CustomList adapter = new
-				CustomList(DragActivityV2.this, equipmentItems, imageId);
+
+		CustomList adapter = new CustomList(DragActivityV2.this, equipmentItems, imageId);
 		list=(ListView)findViewById(R.id.list);
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int which, long id) {
-				
+
 				list.bringToFront();
 				if(which==3)
 				{
 					list.setVisibility(View.INVISIBLE);
 					return ;
 				}
-					Toast.makeText(DragActivityV2.this, "You Clicked at " +equipmentItems[+ which], Toast.LENGTH_SHORT).show();
+				Toast.makeText(DragActivityV2.this, "You Clicked at " +equipmentItems[+ which], Toast.LENGTH_SHORT).show();
 				final ImageView newView = new ImageView (getApplicationContext());
-//				newView.setImageResource(R.drawable.beaker);
+				//				newView.setImageResource(R.drawable.beaker);
 
 				switch(which)
 				{
@@ -175,31 +199,34 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				default:
 					break ;	
 				}
-				
+
 				newView.setId(IDGen.generateViewId());
-				
-				FileOutputStream fos = null;
-				try {
-					fos = openFileOutput("media", MODE_APPEND);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
+				if(!studentMode)
+				{
+					FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 
-				try {
-					fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				try {
-					fos.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
 				int w = 60;
 				int h = 60;
 				int left = 80;
@@ -209,22 +236,106 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				newView.setOnClickListener((OnClickListener) objectDef);
 				newView.setOnLongClickListener((OnLongClickListener) objectDef);
 				newView.setOnTouchListener((OnTouchListener) objectDef);
-				
-//				list.setVisibility(View.INVISIBLE);
+				//				newView.setAlpha(30);
+
+				//				list.setVisibility(View.INVISIBLE);
 			}
 		});
 		list.setVisibility(View.INVISIBLE);
-		
-		findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
-		findViewById(R.id.modeButton).setVisibility(View.INVISIBLE);
-		findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
-		findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
-		
-		buttonsVisible = false ;
 
-		dragInfo = (TextView) findViewById(R.id.textView1);
-		dragInfo.setText("Data");
-		dragInfo.setMovementMethod(new ScrollingMovementMethod());
+		//		findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
+		//		findViewById(R.id.modeButton).setVisibility(View.INVISIBLE);
+		//		findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
+		//		findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
+
+		VerticalSeekBar scaleSeekBar=(VerticalSeekBar) findViewById(R.id.scaleBar);
+		scaleSeekBar.setOnSeekBarChangeListener(new scaleListener());
+
+		//		SeekBar rotateSeekBar = (SeekBar) findViewById(R.id.rotateBar) ;
+		//		rotateSeekBar.setOnSeekBarChangeListener(new rotateListener());
+
+		//		findViewById(R.id.rotateBar).setVisibility(View.INVISIBLE);
+		findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
+		findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
+		buttonsVisible = true ;
+		stepMode = false ;
+		mLongClickStartsDrag = false ;
+
+		SeekArc mSeekArc = (SeekArc) findViewById(R.id.seekArc) ;
+		mSeekArc.setRotation(180);
+		//		mSeekArc.setArcRotation(180);
+		//		mSeekArc.setProgressWidth(360);
+
+		mSeekArc.setOnSeekArcChangeListener(new OnSeekArcChangeListener() {
+
+			//			@Override
+			//			public void onStopTrackingTouch(SeekArc seekArc) {	
+			//			}		
+			//			@Override
+			//			public void onStartTrackingTouch(SeekArc seekArc) {
+			//			}
+			//
+			//			@Override
+			//			public void onProgressChanged(SeekArc seekArc, int progress,
+			//					boolean fromUser) {
+			//				Log.d ("DragActivity", "Progress = " + progress);
+			//			}
+
+			public void onProgressChanged(SeekArc seekArc, int progress,
+					boolean fromUser) {
+				// Log the progress
+				Log.d("DEBUG", "Progress is: "+progress);
+				float rotate = progress ;
+				if(objectSelectedForScaleRotate!=null)
+				{
+					//				scaleRelative(objectSelectedForScaleRotate,scale);
+					objectSelectedForScaleRotate.setRotation(rotate);
+				}
+				//set textView's text
+				//            yourTextView.setText(""+progress);
+			}
+
+			public void onStartTrackingTouch(SeekArc seekArc) {}
+
+			public void onStopTrackingTouch(SeekArc seekArc) {
+
+				if(objectSelectedForScaleRotate != null)
+				{	
+					float rotate = seekArc.getProgress() ;
+
+					FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+
+					try {
+						fos.write(("r" + "," + objectSelectedForScaleRotate.getId() + "," + rotate + "\n").getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+
+		});
+
+		//		dragInfo = (TextView) findViewById(R.id.textView1);
+		//		dragInfo.setText("Data");
+		//		dragInfo.setMovementMethod(new ScrollingMovementMethod());
+
+		if(studentMode)
+			setTitle("Virtual Labs - Student Mode");
+		else
+			setTitle("Virtual Labs - Teacher/Admin Mode");
 
 	}
 	/**
@@ -238,14 +349,15 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		//		menu.add(0, ENABLE_S2_MENU_ID, 0, "Enable Spot2").setShortcut('1', 'c');
 		//		menu.add(0, DISABLE_S2_MENU_ID, 0, "Disable Spot2").setShortcut('2', 'c');
-//		menu.add(0, ADD_OBJECT_MENU_ID, 0, "Add View").setShortcut('9', 'z');
+		//		menu.add(0, ADD_OBJECT_MENU_ID, 0, "Add View").setShortcut('9', 'z');
 		//		menu.add (0, CHANGE_TOUCH_MODE_MENU_ID, 0, "Change Touch Mode");
-//		menu.add(0, PLAY_ANIM, 0, "Play Animation") ;
-//		menu.add(0, RESET, 0, "Reset") ;
-		menu.add(0,PLAY_STEP,0,"Step Mode") ;
+		//		menu.add(0, PLAY_ANIM, 0, "Play Animation") ;
+		//		menu.add(0, RESET, 0, "Reset") ;
+		//		menu.add(0,PLAY_STEP,0,"Step Mode") ;
 		menu.add(0,DELETE_FILE,0,"Delete File") ;
 		menu.add(0,SHOW_BUTTONS,0,"Show/Hide Buttons") ;
-//		menu.add(0,SCALE,0,"Scale and Rotate Mode") ;
+		menu.add(0,ADMIN_MODE,0,"Admin Mode Toggle") ;
+		//		menu.add(0,SCALE,0,"Scale and Rotate Mode") ;
 
 		return true;
 	}
@@ -272,136 +384,136 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	public boolean onLongClick(final View v) 
 	{
-		//		if (mLongClickStartsDrag) {
+		//		//		if (mLongClickStartsDrag) {
+		//		//
+		//		//			//trace ("onLongClick in view: " + v + " touchMode: " + v.isInTouchMode ());
+		//		//
+		//		//			// Make sure the drag was started by a long press as opposed to a long click.
+		//		//			// (Note: I got this from the Workspace object in the Android Launcher code. 
+		//		//			//  I think it is here to ensure that the device is still in touch mode as we start the drag operation.)
+		//		//			if (!v.isInTouchMode()) {
+		//		//				toast ("isInTouchMode returned false. Try touching the view again.");
+		//		//				return false;
+		//		//			}        
+		//		//			return startDrag (v);
+		//		//		}
+		//		if (mLongClickStartsDrag) 
+		//		{
+		//			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		//			alert.setTitle("Scaling");
+		//			alert.setMessage("Enter Scaling or Rotation Value (integer)");
 		//
-		//			//trace ("onLongClick in view: " + v + " touchMode: " + v.isInTouchMode ());
+		//			// Set an EditText view to get user input 
+		//			final EditText input = new EditText(this);
+		//			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+		//			alert.setView(input);
+		//			alert.setPositiveButton("Scale", new DialogInterface.OnClickListener() {
+		//				public void onClick(DialogInterface dialog, int whichButton) {
+		//					String value = input.getText().toString();
+		//					// Do something with value!
+		//					if(value.length() == 0)
+		//					{
+		//						toast("No text entered Error") ;
+		//						return ;
+		//					}
 		//
-		//			// Make sure the drag was started by a long press as opposed to a long click.
-		//			// (Note: I got this from the Workspace object in the Android Launcher code. 
-		//			//  I think it is here to ensure that the device is still in touch mode as we start the drag operation.)
-		//			if (!v.isInTouchMode()) {
-		//				toast ("isInTouchMode returned false. Try touching the view again.");
-		//				return false;
-		//			}        
-		//			return startDrag (v);
+		//					Float scale = Float.parseFloat(value) ;
+		//					//			  scale = scale/100 ;
+		//					trace("Scale =  " + scale);
+		//					scaleRelative(v,scale);
+		//
+		//					FileOutputStream fos = null;
+		//					try {
+		//						fos = openFileOutput("media", MODE_APPEND);
+		//					} catch (FileNotFoundException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//
+		//					try {
+		//						fos.write(("s" + "," + v.getId() + "," + scale + "\n").getBytes());
+		//					} catch (IOException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//
+		//					try {
+		//						fos.close();
+		//					} catch (IOException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//
+		//					//			  	scaleImageAbsolute((ImageView)v,Integer.parseInt(value));
+		//					//					scaleImageRelative((ImageView)v, scale);
+		//				}
+		//			});
+		//
+		//			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		//				public void onClick(DialogInterface dialog, int whichButton) {
+		//					// Canceled.
+		//					//				  scaleImageAbsolute((ImageView)v, 300);
+		//					//					scaleRelative(v,200);
+		//					//					Matrix matrix=new Matrix();
+		//					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
+		//					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
+		//					//					((ImageView)v).setImageMatrix(matrix);
+		//					//					v.setRotation(180);
+		//				}
+		//			});
+		//
+		//			alert.setNeutralButton("Rotate", new DialogInterface.OnClickListener() {
+		//				public void onClick(DialogInterface dialog, int whichButton) {
+		//					// Canceled.
+		//					//				  scaleImageAbsolute((ImageView)v, 300);
+		//					//					scaleRelative(v,200);
+		//					//					Matrix matrix=new Matrix();
+		//					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
+		//					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
+		//					//					((ImageView)v).setImageMatrix(matrix);
+		//
+		//
+		//					String value = input.getText().toString() ;
+		//
+		//					if(value.length() == 0)
+		//					{
+		//						toast("No text entered Error") ;
+		//						return ;
+		//					}
+		//
+		//					Float rotate = Float.parseFloat(value) ;
+		//					v.setRotation(rotate);
+		//
+		//					FileOutputStream fos = null;
+		//					try {
+		//						fos = openFileOutput("media", MODE_APPEND);
+		//					} catch (FileNotFoundException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//
+		//					try {
+		//						fos.write(("r" + "," + v.getId() + "," + rotate + "\n").getBytes());
+		//					} catch (IOException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//
+		//					try {
+		//						fos.close();
+		//					} catch (IOException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//				}
+		//			}) ;
+		//
+		//			alert.show();
+		//
+		//			return true ;
 		//		}
-		if (mLongClickStartsDrag) 
-		{
-			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-			alert.setTitle("Scaling");
-			alert.setMessage("Enter Scaling or Rotation Value (integer)");
-
-			// Set an EditText view to get user input 
-			final EditText input = new EditText(this);
-			input.setInputType(InputType.TYPE_CLASS_NUMBER);
-			alert.setView(input);
-			alert.setPositiveButton("Scale", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					String value = input.getText().toString();
-					// Do something with value!
-					if(value.length() == 0)
-					{
-						toast("No text entered Error") ;
-						return ;
-					}
-
-					Float scale = Float.parseFloat(value) ;
-					//			  scale = scale/100 ;
-					trace("Scale =  " + scale);
-					scaleRelative(v,scale);
-
-					FileOutputStream fos = null;
-					try {
-						fos = openFileOutput("media", MODE_APPEND);
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					try {
-						fos.write(("s" + "," + v.getId() + "," + scale + "\n").getBytes());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					try {
-						fos.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					//			  	scaleImageAbsolute((ImageView)v,Integer.parseInt(value));
-					//					scaleImageRelative((ImageView)v, scale);
-				}
-			});
-
-			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					// Canceled.
-					//				  scaleImageAbsolute((ImageView)v, 300);
-					//					scaleRelative(v,200);
-					//					Matrix matrix=new Matrix();
-					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
-					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
-					//					((ImageView)v).setImageMatrix(matrix);
-					//					v.setRotation(180);
-				}
-			});
-
-			alert.setNeutralButton("Rotate", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					// Canceled.
-					//				  scaleImageAbsolute((ImageView)v, 300);
-					//					scaleRelative(v,200);
-					//					Matrix matrix=new Matrix();
-					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
-					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
-					//					((ImageView)v).setImageMatrix(matrix);
-
-
-					String value = input.getText().toString() ;
-
-					if(value.length() == 0)
-					{
-						toast("No text entered Error") ;
-						return ;
-					}
-
-					Float rotate = Float.parseFloat(value) ;
-					v.setRotation(rotate);
-
-					FileOutputStream fos = null;
-					try {
-						fos = openFileOutput("media", MODE_APPEND);
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					try {
-						fos.write(("r" + "," + v.getId() + "," + rotate + "\n").getBytes());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					try {
-						fos.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}) ;
-
-			alert.show();
-
-			return true ;
-		}
-
-
+		//
+		//
 
 		// If we get here, return false to indicate that we have not taken care of the event.
 		return false;
@@ -424,38 +536,222 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//		case DISABLE_S2_MENU_ID:
 		//			if (mSpot2 != null) mSpot2.setDragLayer (null);
 		//			return true;
-//		case ADD_OBJECT_MENU_ID:
-//
-//			(findViewById(R.id.list)).setVisibility(View.VISIBLE);
-//			return true ;
-			// Add a new object to the DragLayer and see if it can be dragged around.
-			//			ImageView newView = new ImageView (this);
-			//			newView.setImageResource (R.drawable.hello);
-			//			newView.setId(IDGen.generateViewId());
-			//			//            imageNo++ ;
-			//			int w = 60;
-			//			int h = 60;
-			//			int left = 80;
-			//			int top = 100;
-			//			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
-			//			mDragLayer.addView (newView, lp);
-			//			newView.setOnClickListener(this);
-			//			newView.setOnLongClickListener(this);
-			//			newView.setOnTouchListener(this);
-			//			return true;
+		//		case ADD_OBJECT_MENU_ID:
+		//
+		//			(findViewById(R.id.list)).setVisibility(View.VISIBLE);
+		//			return true ;
+		// Add a new object to the DragLayer and see if it can be dragged around.
+		//			ImageView newView = new ImageView (this);
+		//			newView.setImageResource (R.drawable.hello);
+		//			newView.setId(IDGen.generateViewId());
+		//			//            imageNo++ ;
+		//			int w = 60;
+		//			int h = 60;
+		//			int left = 80;
+		//			int top = 100;
+		//			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+		//			mDragLayer.addView (newView, lp);
+		//			newView.setOnClickListener(this);
+		//			newView.setOnLongClickListener(this);
+		//			newView.setOnTouchListener(this);
+		//			return true;
 
-			/* Option Menu for selecting Image */
-			//			final ImageView newView = new ImageView (this);
-			//			CharSequence equipment[] = new CharSequence[] {"burrete", "beaker", "testtube"};
+		/* Option Menu for selecting Image */
+		//			final ImageView newView = new ImageView (this);
+		//			CharSequence equipment[] = new CharSequence[] {"burrete", "beaker", "testtube"};
+		//
+		//			/* For saving adding image into the csv data file*/
+		//
+		//			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		//			builder.setTitle("Pick an equipment");
+		//			builder.setItems(equipment, new DialogInterface.OnClickListener() {
+		//				@Override
+		//				public void onClick(DialogInterface dialog, int which) {
+		//					// the user clicked on equipment[which]
+		//					FileOutputStream fos = null;
+		//					try {
+		//						fos = openFileOutput("media", MODE_APPEND);
+		//					} catch (FileNotFoundException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//
+		//					try {
+		//						fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
+		//					} catch (IOException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//
+		//					try {
+		//						fos.close();
+		//					} catch (IOException e) {
+		//						// TODO Auto-generated catch block
+		//						e.printStackTrace();
+		//					}
+		//
+		//					switch(which)
+		//					{
+		//					case 0:
+		//						newView.setImageResource(R.drawable.burrete);
+		//						break ;
+		//					case 1:
+		//						newView.setImageResource(R.drawable.beaker);
+		//						break ;
+		//					case 2:
+		//						newView.setImageResource(R.drawable.testtube);
+		//						break ;
+		//					default:
+		//						break ;	
+		//					}
+		//				}
+		//			});
+		//			builder.show();
+		//
+		//			//			ImageView newView = new ImageView (this);
+		//			//			new LoadImageTask(newView).execute(targetUrl);
+		//			//			newView.setImageResource (R.drawable.hello);
+		//			newView.setId(IDGen.generateViewId());
+		//			//            imageNo++ ;
+		//			int w = 60;
+		//			int h = 60;
+		//			int left = 60;
+		//			int top = 60;
+		//			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+		//			mDragLayer.addView (newView, lp);
+		//			newView.setOnClickListener(this);
+		//			newView.setOnLongClickListener(this);
+		//			newView.setOnTouchListener(this);
+		//
+		//			//			lp.height = 100 ;
+		//			//			lp.width = 100 ;
+		//
+		//			//			scaleRelative(newView,200);
+		//
+		//			//			scaleImageAbsolute(newView, 100);
+		//
+		//
+		//			return true;
+
+		//			image1 = (ImageView)findViewById(R.id.image1);			   
+		//			new LoadImageTask(image1).execute(targetUrl);
+
+
+		//		case CHANGE_TOUCH_MODE_MENU_ID:
+		//			mLongClickStartsDrag = !mLongClickStartsDrag;
+		//			String message = mLongClickStartsDrag ? "Changed touch mode. Drag now starts on long touch (click)." 
+		//					: "Changed touch mode. Drag now starts on touch (click).";
+		//			Toast.makeText (getApplicationContext(), message, Toast.LENGTH_LONG).show ();
+		//			return true;
+		//		case PLAY_ANIM:
+		//			FileInputStream fis = null ;
+		//
+		//			try {
+		//				fis = openFileInput("media") ;
+		//			} catch (FileNotFoundException e1) {
+		//				// TODO Auto-generated catch block
+		//				e1.printStackTrace();
+		//				toast("Error: File Not Found") ;
+		//				return true ;
+		//			}
+		//
+		//			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+		//
+		//			nextMove(reader);
+		//			return true ;
+		//		case RESET:
+		//			onCreate(null);
+		//			lineNo = 1 ;
+		//			return true ;
+		//		case PLAY_STEP:
+		//			stepMode = !stepMode ;
+		//			return true ;
+		case DELETE_FILE:
+			File file = new File(getFilesDir().getAbsolutePath()+"/media") ;
+			//			toast((getFilesDir().getAbsolutePath()+"/media").toString()) ;
+			file.delete() ;
+			return true ;
+			//		case SCALE:
+			//			mLongClickStartsDrag = !mLongClickStartsDrag ;
+			//			return true ;
+		case SHOW_BUTTONS:
+			if(buttonsVisible)
+			{
+				findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.modeRadioGroup).setVisibility(View.INVISIBLE);
+				//				findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.stepModeToggle).setVisibility(View.INVISIBLE);
+				findViewById(R.id.ghostModeToggle).setVisibility(View.INVISIBLE);
+				buttonsVisible = !buttonsVisible ;
+			}
+			else
+			{
+				findViewById(R.id.addButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.modeRadioGroup).setVisibility(View.VISIBLE);
+				//				findViewById(R.id.playButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.resetButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.stepModeToggle).setVisibility(View.VISIBLE);
+				findViewById(R.id.ghostModeToggle).setVisibility(View.VISIBLE);
+				buttonsVisible = !buttonsVisible ;
+			}
+			return true ;
+		case ADMIN_MODE:
+			studentMode = !studentMode ;
+			if(studentMode)
+				setTitle("Virtual Labs - Student Mode");
+			else
+				setTitle("Virtual Labs - Teacher/Admin Mode");
+			if(Debugging)
+				trace("STUDENT MODE = " + studentMode) ;
+			break ;
+		}
+
+
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	/**
+	 * This is the starting point for a drag operation if mLongClickStartsDrag is false.
+	 * It looks for the down event that gets generated when a user touches the screen.
+	 * Only that initiates the drag-drop sequence.
+	 *
+	 */    
+
+	public boolean onTouch (final View v, MotionEvent ev) 
+	{
+
+		if (!(currentTouchMode == TouchMode.MOVE) && ev.getAction() == MotionEvent.ACTION_DOWN) 
+		{
+
+			objectSelectedForScaleRotate = v ;
+			Log.d("DEBUG", "ObjectSelected "+objectSelectedForScaleRotate.getId());
+
+
+			//			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			//			alert.setTitle("Scaling");
+			//			alert.setMessage("Enter Scaling or Rotation Value (integer)");
 			//
-			//			/* For saving adding image into the csv data file*/
+			//			// Set an EditText view to get user input 
+			//			final EditText input = new EditText(this);
+			//			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+			//			alert.setView(input);
+			//			alert.setPositiveButton("Scale", new DialogInterface.OnClickListener() {
+			//				public void onClick(DialogInterface dialog, int whichButton) {
+			//					String value = input.getText().toString();
+			//					// Do something with value!
+			//					if(value.length() == 0)
+			//					{
+			//						toast("No text entered Error") ;
+			//						return ;
+			//					}
 			//
-			//			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			//			builder.setTitle("Pick an equipment");
-			//			builder.setItems(equipment, new DialogInterface.OnClickListener() {
-			//				@Override
-			//				public void onClick(DialogInterface dialog, int which) {
-			//					// the user clicked on equipment[which]
+			//					Float scale = Float.parseFloat(value) ;
+			//					//			  scale = scale/100 ;
+			//					trace("Scale =  " + scale);
+			//					scaleRelative(v,scale);
+			//
 			//					FileOutputStream fos = null;
 			//					try {
 			//						fos = openFileOutput("media", MODE_APPEND);
@@ -465,7 +761,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//					}
 			//
 			//					try {
-			//						fos.write(("a" + "," + which + "," + newView.getId() + "\n").getBytes());
+			//						fos.write(("s" + "," + v.getId() + "," + scale + "\n").getBytes());
 			//					} catch (IOException e) {
 			//						// TODO Auto-generated catch block
 			//						e.printStackTrace();
@@ -478,133 +774,88 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//						e.printStackTrace();
 			//					}
 			//
-			//					switch(which)
-			//					{
-			//					case 0:
-			//						newView.setImageResource(R.drawable.burrete);
-			//						break ;
-			//					case 1:
-			//						newView.setImageResource(R.drawable.beaker);
-			//						break ;
-			//					case 2:
-			//						newView.setImageResource(R.drawable.testtube);
-			//						break ;
-			//					default:
-			//						break ;	
-			//					}
+			//					//			  	scaleImageAbsolute((ImageView)v,Integer.parseInt(value));
+			//					//					scaleImageRelative((ImageView)v, scale);
 			//				}
 			//			});
-			//			builder.show();
 			//
-			//			//			ImageView newView = new ImageView (this);
-			//			//			new LoadImageTask(newView).execute(targetUrl);
-			//			//			newView.setImageResource (R.drawable.hello);
-			//			newView.setId(IDGen.generateViewId());
-			//			//            imageNo++ ;
-			//			int w = 60;
-			//			int h = 60;
-			//			int left = 60;
-			//			int top = 60;
-			//			DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
-			//			mDragLayer.addView (newView, lp);
-			//			newView.setOnClickListener(this);
-			//			newView.setOnLongClickListener(this);
-			//			newView.setOnTouchListener(this);
+			//			alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			//				public void onClick(DialogInterface dialog, int whichButton) {
+			//					// Canceled.
+			//					//				  scaleImageAbsolute((ImageView)v, 300);
+			//					//					scaleRelative(v,200);
+			//					//					Matrix matrix=new Matrix();
+			//					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
+			//					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
+			//					//					((ImageView)v).setImageMatrix(matrix);
+			//					//					v.setRotation(180);
+			//				}
+			//			});
 			//
-			//			//			lp.height = 100 ;
-			//			//			lp.width = 100 ;
+			//			alert.setNeutralButton("Rotate", new DialogInterface.OnClickListener() {
+			//				public void onClick(DialogInterface dialog, int whichButton) {
+			//					// Canceled.
+			//					//				  scaleImageAbsolute((ImageView)v, 300);
+			//					//					scaleRelative(v,200);
+			//					//					Matrix matrix=new Matrix();
+			//					//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
+			//					//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
+			//					//					((ImageView)v).setImageMatrix(matrix);
 			//
-			//			//			scaleRelative(newView,200);
 			//
-			//			//			scaleImageAbsolute(newView, 100);
+			//					String value = input.getText().toString() ;
 			//
+			//					if(value.length() == 0)
+			//					{
+			//						toast("No text entered Error") ;
+			//						return ;
+			//					}
 			//
-			//			return true;
+			//					Float rotate = Float.parseFloat(value) ;
+			//					v.setRotation(rotate);
+			//
+			//					FileOutputStream fos = null;
+			//					try {
+			//						fos = openFileOutput("media", MODE_APPEND);
+			//					} catch (FileNotFoundException e) {
+			//						// TODO Auto-generated catch block
+			//						e.printStackTrace();
+			//					}
+			//
+			//					try {
+			//						fos.write(("r" + "," + v.getId() + "," + rotate + "\n").getBytes());
+			//					} catch (IOException e) {
+			//						// TODO Auto-generated catch block
+			//						e.printStackTrace();
+			//					}
+			//
+			//					try {
+			//						fos.close();
+			//					} catch (IOException e) {
+			//						// TODO Auto-generated catch block
+			//						e.printStackTrace();
+			//					}
+			//				}
+			//			}) ;
+			//
+			//			alert.show();
 
-			//			image1 = (ImageView)findViewById(R.id.image1);			   
-			//			new LoadImageTask(image1).execute(targetUrl);
-
-
-			//		case CHANGE_TOUCH_MODE_MENU_ID:
-			//			mLongClickStartsDrag = !mLongClickStartsDrag;
-			//			String message = mLongClickStartsDrag ? "Changed touch mode. Drag now starts on long touch (click)." 
-			//					: "Changed touch mode. Drag now starts on touch (click).";
-			//			Toast.makeText (getApplicationContext(), message, Toast.LENGTH_LONG).show ();
-			//			return true;
-//		case PLAY_ANIM:
-//			FileInputStream fis = null ;
-//
-//			try {
-//				fis = openFileInput("media") ;
-//			} catch (FileNotFoundException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//				toast("Error: File Not Found") ;
-//				return true ;
-//			}
-//
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-//
-//			nextMove(reader);
-//			return true ;
-//		case RESET:
-//			onCreate(null);
-//			lineNo = 1 ;
-//			return true ;
-		case PLAY_STEP:
-			stepMode = !stepMode ;
-			return true ;
-		case DELETE_FILE:
-			File file = new File(getFilesDir().getAbsolutePath()+"/media") ;
-			//			toast((getFilesDir().getAbsolutePath()+"/media").toString()) ;
-			file.delete() ;
-			return true ;
-//		case SCALE:
-//			mLongClickStartsDrag = !mLongClickStartsDrag ;
-//			return true ;
-		case SHOW_BUTTONS:
-			if(buttonsVisible)
-			{
-				findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
-				findViewById(R.id.modeButton).setVisibility(View.INVISIBLE);
-				findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
-				findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
-			}
-			else
-			{
-				findViewById(R.id.addButton).setVisibility(View.VISIBLE);
-				findViewById(R.id.modeButton).setVisibility(View.VISIBLE);
-				findViewById(R.id.playButton).setVisibility(View.VISIBLE);
-				findViewById(R.id.resetButton).setVisibility(View.VISIBLE);
-			}
 			return true ;
 		}
+		else
+		{
+			boolean handledHere = false;
+			final int action = ev.getAction();
 
-		return super.onOptionsItemSelected(item);
-	}
+			// In the situation where a long click is not needed to initiate a drag, simply start on the down event.
+			if (action == MotionEvent.ACTION_DOWN) {
+				handledHere = startDrag (v);
+			}
 
-	/**
-	 * This is the starting point for a drag operation if mLongClickStartsDrag is false.
-	 * It looks for the down event that gets generated when a user touches the screen.
-	 * Only that initiates the drag-drop sequence.
-	 *
-	 */    
+			objectSelectedForScaleRotate = v ;
 
-	public boolean onTouch (View v, MotionEvent ev) 
-	{
-		// If we are configured to start only on a long click, we are not going to handle any events here.
-		if (mLongClickStartsDrag) return false;
-
-		boolean handledHere = false;
-
-		final int action = ev.getAction();
-
-		// In the situation where a long click is not needed to initiate a drag, simply start on the down event.
-		if (action == MotionEvent.ACTION_DOWN) {
-			handledHere = startDrag (v);
+			return handledHere;
 		}
-
-		return handledHere;
 	}
 
 	/**
@@ -809,6 +1060,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					newView.setOnClickListener(this);
 					newView.setOnLongClickListener(this);
 					newView.setOnTouchListener(this);
+					if(ghostMode)
+						newView.setAlpha(30);
 					//					nextMove(reader) ;
 
 					caseRead = 'a' ;
@@ -821,6 +1074,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					initY = Float.parseFloat(RowData[3]) ;
 					finX = Float.parseFloat(RowData[4]) ;
 					finY = Float.parseFloat(RowData[5]) ;
+
+					initX *= screenMetrics.widthPixels ;
+					initY *= screenMetrics.heightPixels ;
+					finX *= screenMetrics.widthPixels ;
+					finY *= screenMetrics.heightPixels ;
+
+					//					trace("initX = " + initX) ;
+					//					trace("heightPixels = " + screenMetrics.heightPixels) ;
 					anim(imageId,initX,initY,finX,finY);
 					caseRead = 'm' ;
 					break ;
@@ -838,14 +1099,15 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					imageId = Integer.parseInt(RowData[1]) ;
 					scale = Float.parseFloat(RowData[2]) ;
 
-					float scaleDec = scale / 100 ;
-					//				trace("scaleDec" + scaleDec) ;
-					//				trace("getLayoutHeight before"+v.getLayoutParams().height) ;
-					((ImageView)findViewById(imageId)).getLayoutParams().height *= scaleDec ;
-					//				trace("getLayoutHeight after"+v.getLayoutParams().height) ;
-					((ImageView)findViewById(imageId)).getLayoutParams().width *= scaleDec ;
-					((ImageView)findViewById(imageId)).setLayoutParams(((ImageView)findViewById(imageId)).getLayoutParams());
-
+					//					float scaleDec = scale / 100 ;
+					//					//				trace("scaleDec" + scaleDec) ;
+					//					//				trace("getLayoutHeight before"+v.getLayoutParams().height) ;
+					//					((ImageView)findViewById(imageId)).getLayoutParams().height *= scaleDec ;
+					//					//				trace("getLayoutHeight after"+v.getLayoutParams().height) ;
+					//					((ImageView)findViewById(imageId)).getLayoutParams().width *= scaleDec ;
+					//					((ImageView)findViewById(imageId)).setLayoutParams(((ImageView)findViewById(imageId)).getLayoutParams());
+					scaleAbsolute(findViewById(imageId), scale);
+					break ;
 
 
 				}
@@ -867,6 +1129,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		return caseRead; 
 	}
 
+	@SuppressWarnings("unused")
 	private class LoadImageTask extends AsyncTask<String, Void, Bitmap>{
 
 		ImageView targetImageView;
@@ -907,6 +1170,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		return bm;
 	}
 
+	@SuppressWarnings("unused")
 	private void scaleImageAbsolute(ImageView view, int boundBoxInDp)
 	{
 		// Get the ImageView and its bitmap
@@ -948,6 +1212,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		view.setLayoutParams(params);
 	}
 
+	@SuppressWarnings("unused")
 	private void scaleImageRelative(ImageView view, float scale)
 	{
 		// Get the ImageView and its bitmap
@@ -986,12 +1251,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		view.setLayoutParams(params);
 	}
 
+	@SuppressWarnings("unused")
 	private int dpToPx(int dp)
 	{
 		float density = getApplicationContext().getResources().getDisplayMetrics().density;
 		return Math.round((float)dp * density);
 	}
 
+	@SuppressWarnings("unused")
 	private void scaleRelative(View v,float scale)
 	{
 		float scaleDec = scale / 100 ;
@@ -1004,42 +1271,219 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	}
 
+	private void scaleAbsolute(View v,float value)
+	{
+		v.getLayoutParams().height = (int)value ;
+		v.getLayoutParams().width = (int)value ;
+		v.setLayoutParams(v.getLayoutParams());
+	}
+
 	public void playBack(View v)
 	{
+
 		FileInputStream fis = null ;
 
 		try {
 			fis = openFileInput("media") ;
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			//			e1.printStackTrace();
 			toast("Error: File Not Found") ;
+			trace("File Error");
 			return ;
 		}
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+		//		trace("Error Reaching wrong code");
 
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 		nextMove(reader);
 	}
-	
+
 	public void reset(View v)
 	{
 		onCreate(null);
 		lineNo = 1 ;
-	}
-	
-	public void scaleRotateToggle(View v)
-	{
-		boolean on = ((ToggleButton) v).isChecked();
-		
-		if(on)
-			mLongClickStartsDrag = true;
-		else
-			mLongClickStartsDrag = false ;
+		mLongClickStartsDrag = false ;
+		stepMode = false ;
+		objectSelectedForScaleRotate = null ;
+		currentTouchMode = TouchMode.MOVE ;
+		ghostMode = false ;
+		studentMode = false ;
 	}
 
 	public void addObject(View v)
 	{
-		(findViewById(R.id.list)).setVisibility(View.VISIBLE);
+		if(findViewById(R.id.list).getVisibility()==View.INVISIBLE)
+			(findViewById(R.id.list)).setVisibility(View.VISIBLE);
+		else
+			(findViewById(R.id.list)).setVisibility(View.INVISIBLE);
+	}
+
+	public void stepModeToggle(View v)
+	{
+		boolean on = ((ToggleButton) v).isChecked();
+
+		if(on)
+			stepMode = true;
+		else
+			stepMode = false ;
+	}
+
+	public void modeRadioClick(View view) {
+		// Is the button now checked?
+		boolean checked = ((RadioButton) view).isChecked();
+
+		// Check which radio button was clicked
+		switch(view.getId()) {
+		case R.id.moveRadioButton:
+			if (checked)
+			{
+				toast("Move Mode") ;
+				currentTouchMode = TouchMode.MOVE ;
+				objectSelectedForScaleRotate = null ;
+				findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
+				findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
+			}
+
+			break;
+			//		case R.id.rotateRadioButton:
+			//			if (checked)
+			//			{
+			//				toast("Rotate");
+			//				currentTouchMode = TouchMode.ROTATE ;
+			//			}
+			//			break;
+		case R.id.scaleRadioButton:
+			if(checked)
+			{
+				toast("Touch the object to scale and rotate");
+				currentTouchMode = TouchMode.SCALE ;
+				findViewById(R.id.seekArc).setVisibility(View.VISIBLE);
+				findViewById(R.id.scaleBar).setVisibility(View.VISIBLE);
+				findViewById(R.id.seekArc).bringToFront();
+				findViewById(R.id.scaleBar).bringToFront();
+			}
+			break ;
+		}
+	}
+
+	private class scaleListener implements SeekBar.OnSeekBarChangeListener {
+
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
+			// Log the progress
+			Log.d("DEBUG", "Progress is: "+progress);
+			float scale = progress ;
+			scale /= 100 ;
+			scale *= screenMetrics.heightPixels ;
+			if(objectSelectedForScaleRotate!=null && scale != 0)
+			{
+				//				scaleRelative(objectSelectedForScaleRotate,scale);
+				scaleAbsolute(objectSelectedForScaleRotate,scale);
+			}
+			//set textView's text
+			//            yourTextView.setText(""+progress);
+		}
+
+		public void onStartTrackingTouch(SeekBar seekBar) {}
+
+		public void onStopTrackingTouch(SeekBar seekBar) {
+
+			if(objectSelectedForScaleRotate!=null)
+			{
+				float scale = seekBar.getProgress() ;
+				scale /= 100 ;
+				scale *= screenMetrics.heightPixels ;
+				if(!studentMode)
+				{
+					FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.write(("s" + "," + objectSelectedForScaleRotate.getId() + "," + scale + "\n").getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+	}
+
+	@SuppressWarnings("unused")
+	private class rotateListener implements SeekBar.OnSeekBarChangeListener
+	{
+
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
+			// Log the progress
+			Log.d("DEBUG", "Progress is: "+progress);
+			float rotate = progress ;
+			if(objectSelectedForScaleRotate!=null)
+			{
+				//				scaleRelative(objectSelectedForScaleRotate,scale);
+				objectSelectedForScaleRotate.setRotation(rotate);
+			}
+			//set textView's text
+			//            yourTextView.setText(""+progress);
+		}
+
+		public void onStartTrackingTouch(SeekBar seekBar) {}
+
+		public void onStopTrackingTouch(SeekBar seekBar) {
+
+			if(objectSelectedForScaleRotate != null)
+			{	
+				float rotate = seekBar.getProgress() ;
+
+				if(!studentMode)
+				{
+					FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+
+					try {
+						fos.write(("r" + "," + objectSelectedForScaleRotate.getId() + "," + rotate + "\n").getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+	}
+
+	public static void ghostModeToggle(View v)
+	{
+		boolean on = ((ToggleButton) v).isChecked();
+
+		if(on)
+			ghostMode = true;
+		else
+			ghostMode = false ;
 	}
 } // end class

@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.blahti.example.drag2.DragLayer xmlns:android="http://schemas.android.com/apk/res/android"
+<com.blahti.example.drag2.DragLayer 
     xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
+    xmlns:seekarc="http://schemas.android.com/apk/res/com.blahti.example.drag2"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android1="http://schemas.android.com/apk/res/android"
     android:id="@+id/drag_layer"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-   <RelativeLayout
+    <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:text="@string/InfoData" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
 
         <Button
             android:id="@+id/playButton"
@@ -25,18 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:text="Play"
-            android:onClick="playBack" />
-       
-        <Button
-            android:id="@+id/addButton"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="Add"
-            android:onClick="addObject" />
+            android:onClick="playBack"
+            android:text="Play" />
 
         <ListView
             android:id="@+id/list"
@@ -44,7 +29,8 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/playButton"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/addButton"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/addButton"
             android:orientation="vertical" />
 
         <Button
@@ -54,19 +40,87 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_toRightOf="@+id/playButton"
-            android:text="Reset"
-            android:onClick="reset" />
+            android:onClick="reset"
+            android:text="Reset" />
 
-        <ToggleButton
-            android:id="@+id/modeButton"
+        <Button
+            android:id="@+id/addButton"
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/resetButton"
+            android:onClick="addObject"
+            android:text="Add" />
+
+        <RadioGroup
+            android:id="@+id/modeRadioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true" >
+
+            <RadioButton
+                android:id="@+id/moveRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:onClick="modeRadioClick"
+                android:text="Move Mode" />
+
+            <RadioButton
+                android:id="@+id/scaleRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="modeRadioClick"
+                android:text="Scale and Rotate Mode" />
+        </RadioGroup>
+
+        <com.blahti.example.drag2.VerticalSeekBar
+            android:id="@+id/scaleBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/stepModeToggle"
             android:layout_alignParentRight="true"
-            android:textOn="ScaleRotateMode"
-            android:textOff="MoveMode"
-            android:text="ModeToggle"
-            android:onClick="scaleRotateToggle" />
+            android:layout_alignParentTop="true"
+            android:max="100" />
+
+        <com.blahti.example.drag2.SeekArc
+            android:id="@+id/seekArc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/stepModeToggle"
+            android:layout_alignLeft="@+id/modeRadioGroup"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center"
+            android:layout_toLeftOf="@+id/scaleBar"
+            android:padding="30dp"
+            seekarc:rotation="180"
+            seekarc:startAngle="0"
+            seekarc:sweepAngle="360"
+            seekarc:touchInside="true" />
+
+        <ToggleButton
+            android:id="@+id/stepModeToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/modeRadioGroup"
+            android:layout_alignParentRight="true"
+            android:onClick="stepModeToggle"
+            android:text="StepModeToggle"
+            android:textOff="Cont Mode"
+            android:textOn="Step Mode" />
+
+        <ToggleButton
+            android:id="@+id/ghostModeToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/list"
+            android:text="ToggleButton"
+            android:textOn="Ghost On"
+            android:textOff="Ghost Off"
+            android:onClick="ghostModeToggle" />
 
     </RelativeLayout>
 
