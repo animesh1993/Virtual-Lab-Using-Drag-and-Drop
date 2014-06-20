@@ -37,11 +37,16 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 
 /**
@@ -53,6 +58,17 @@ import java.io.IOException;
  */
 
 public class DragController {
+
+	private static int moveNo = 1 ;
+
+	public static int getMoveNo() {
+		return moveNo;
+	}
+
+	public static void setMoveNo(int moveNo) {
+		DragController.moveNo = moveNo;
+	}
+
 	private static final String TAG = "DragController";
 
 	/** Indicates the drag is a move.  */
@@ -449,7 +465,7 @@ public class DragController {
 		case MotionEvent.ACTION_UP:
 			if (mDragging) 
 			{
-				drop(screenX, screenY);
+//				drop(screenX, screenY);
 				xFinal = screenX;
 				yFinal = screenY;
 
@@ -494,8 +510,103 @@ public class DragController {
 					try {
 						fos.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+					}
+
+					drop(screenX, screenY);
+				}
+				else
+				{
+					int imageId ;
+					float initX, finX, initY, finY ;
+					String[] RowData = null;
+					int i = 0 ;
+
+					FileInputStream fis = null ;
+
+					try {
+						fis = mContext.openFileInput("media") ;
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						//			e1.printStackTrace();
+						return false;
+					}
+
+					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+					try {
+						String line;
+						while(i < moveNo)
+						{
+							line = reader.readLine() ;
+							i++ ;
+						}
+						if ((line = reader.readLine()) != null) 
+						{
+
+							RowData = line.split(",");
+							if(RowData[0].charAt(0) != 'm')
+							{
+								if(RowData[0].charAt(0) == 'a')
+									moveNo++ ;
+								endDrag();
+								return false ;
+							}
+							imageId = Integer.parseInt(RowData[1]);
+							initX = Float.parseFloat(RowData[2]);
+							initY = Float.parseFloat(RowData[3]) ;
+							finX = Float.parseFloat(RowData[4]) ;
+							finY = Float.parseFloat(RowData[5]) ;
+
+							initX *= mDisplayMetrics.widthPixels ;
+							initY *= mDisplayMetrics.heightPixels ;
+							finX *= mDisplayMetrics.widthPixels ;
+							finY *= mDisplayMetrics.heightPixels ;
+							
+							Log.d ("DragController", "finX = " + finX + "xFInal = " + (xFinal-mTouchOffsetX));
+							Log.d ("DragController", "finY = " + finY + "yFInal = " + (yFinal-mTouchOffsetY));
+							Log.d("DragController","DIsplay" + (0.01*mDisplayMetrics.widthPixels)) ;
+							
+//							if(viewId != imageId)
+//							{
+//								endDrag();
+//								break ;
+//							}
+//
+//							Log.d("DragController","Crossed Line " + viewId + " Image " + imageId) ;
+							
+							if(Math.abs(((xInitial-mTouchOffsetX) - initX)) > (0.1)*mDisplayMetrics.widthPixels)
+							{
+								endDrag();
+								return false ;
+							}
+		
+							if(Math.abs(((yInitial-mTouchOffsetY) - initY)) > (0.1)*mDisplayMetrics.heightPixels)
+							{
+								endDrag();
+								return false ;
+							}
+							
+							if(Math.abs(((xFinal-mTouchOffsetX) - finX)) > (0.1)*mDisplayMetrics.widthPixels) 
+							{
+								endDrag();
+								return false ;
+							}
+							
+							if(Math.abs(((yFinal-mTouchOffsetY) - finY)) > (0.1)*mDisplayMetrics.heightPixels)
+							{
+								endDrag();
+								return false ;
+							}
+							
+							
+							
+							drop(finX + mTouchOffsetX, finY + mTouchOffsetY);
+							moveNo++ ;
+						}
+					}
+					catch (IOException ex)
+					{
 					}
 
 				}

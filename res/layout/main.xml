@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.blahti.example.drag2.DragLayer 
-    xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
+<com.blahti.example.drag2.DragLayer xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
     xmlns:seekarc="http://schemas.android.com/apk/res/com.blahti.example.drag2"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:android1="http://schemas.android.com/apk/res/android"
@@ -66,14 +65,14 @@
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:onClick="modeRadioClick"
-                android:text="Move Mode" />
+                android:text="Move" />
 
             <RadioButton
                 android:id="@+id/scaleRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="modeRadioClick"
-                android:text="Scale and Rotate Mode" />
+                android:text="Scale/Rotate" />
         </RadioGroup>
 
         <com.blahti.example.drag2.VerticalSeekBar
@@ -117,11 +116,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_toRightOf="@+id/list"
+            android:onClick="ghostModeToggle"
             android:text="ToggleButton"
-            android:textOn="Ghost On"
             android:textOff="Ghost Off"
-            android:onClick="ghostModeToggle" />
-
+            android:textOn="Ghost On" />
     </RelativeLayout>
 
 </com.blahti.example.drag2.DragLayer>

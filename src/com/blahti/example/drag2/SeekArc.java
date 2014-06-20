@@ -70,12 +70,12 @@ public class SeekArc extends View {
 	/**
 	 * The width of the progress line for this SeekArc
 	 */
-	private int mProgressWidth = 4;
+	private int mProgressWidth = 0;
 	
 	/**
 	 * The Width of the background arc for the SeekArc 
 	 */
-	private int mArcWidth = 2;
+	private int mArcWidth = 1;
 	
 	/**
 	 * The Angle to start drawing this Arc from
@@ -182,7 +182,7 @@ public class SeekArc extends View {
 
 		// Defaults, may need to link this into theme settings
 		int arcColor = res.getColor(R.color.progress_gray);
-		int progressColor = res.getColor(android.R.color.holo_blue_light);
+		int progressColor = res.getColor(R.color.progress_gray);
 		int thumbHalfheight = 0;
 		int thumbHalfWidth = 0;
 		mThumb = res.getDrawable(R.drawable.seek_arc_control_selector);

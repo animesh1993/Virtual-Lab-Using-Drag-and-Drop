@@ -268,18 +268,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		mSeekArc.setOnSeekArcChangeListener(new OnSeekArcChangeListener() {
 
-			//			@Override
-			//			public void onStopTrackingTouch(SeekArc seekArc) {	
-			//			}		
-			//			@Override
-			//			public void onStartTrackingTouch(SeekArc seekArc) {
-			//			}
-			//
-			//			@Override
-			//			public void onProgressChanged(SeekArc seekArc, int progress,
-			//					boolean fromUser) {
-			//				Log.d ("DragActivity", "Progress = " + progress);
-			//			}
+			float originalRotate ;
 
 			public void onProgressChanged(SeekArc seekArc, int progress,
 					boolean fromUser) {
@@ -295,7 +284,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				//            yourTextView.setText(""+progress);
 			}
 
-			public void onStartTrackingTouch(SeekArc seekArc) {}
+			public void onStartTrackingTouch(SeekArc seekArc) {
+				originalRotate = objectSelectedForScaleRotate.getRotation() ;
+				trace("Inside onStart") ;
+				trace("Inside originalRotate" + originalRotate) ;
+			}
 
 			public void onStopTrackingTouch(SeekArc seekArc) {
 
@@ -303,25 +296,84 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				{	
 					float rotate = seekArc.getProgress() ;
 
-					FileOutputStream fos = null;
-					try {
-						fos = openFileOutput("media", MODE_APPEND);
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					}
+					if(!studentMode)
+					{
+						FileOutputStream fos = null;
+						try {
+							fos = openFileOutput("media", MODE_APPEND);
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
 
-					try {
-						fos.write(("r" + "," + objectSelectedForScaleRotate.getId() + "," + rotate + "\n").getBytes());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+						try {
+							fos.write(("r" + "," + objectSelectedForScaleRotate.getId() + "," + rotate + "\n").getBytes());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 
-					try {
-						fos.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						try {
+							fos.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					else
+					{
+						int imageId ;
+						float rotateRead ;
+						String[] RowData = null;
+						int i = 0 ;
+
+						FileInputStream fis = null ;
+
+						try {
+							fis = openFileInput("media") ;
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							return ;
+						}
+
+						BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+						try {
+							String line;
+							while(i < DragController.getMoveNo())
+							{
+								line = reader.readLine() ;
+								i++ ;
+							}
+							if ((line = reader.readLine()) != null) 
+							{
+
+								RowData = line.split(",");
+								if(RowData[0].charAt(0) != 'r')
+								{
+									if(RowData[0].charAt(0) == 'a')
+										DragController.setMoveNo(DragController.getMoveNo()+1);
+									return ;
+								}
+
+								imageId = Integer.parseInt(RowData[1]);
+								rotateRead = Float.parseFloat(RowData[2]) ; 
+
+								trace("Rotate Read " + rotateRead) ;
+								trace("Rotation " + objectSelectedForScaleRotate.getRotation()) ;
+
+								if((objectSelectedForScaleRotate.getRotation() - rotateRead) > 10)
+								{
+									objectSelectedForScaleRotate.setRotation(originalRotate);
+									return ;
+								}
+
+								objectSelectedForScaleRotate.setRotation(rotateRead);
+							}
+						}
+						catch (IOException ex)
+						{
+						}
 					}
 				}
 			}
@@ -1008,6 +1060,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		logoFocus.startAnimation(anim);
 	}
 
+	@SuppressWarnings("deprecation")
 	public char nextMove(BufferedReader reader)
 	{
 		int imageId ;
@@ -1057,9 +1110,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					int top = 100;
 					DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
 					mDragLayer.addView (newView, lp);
-					newView.setOnClickListener(this);
-					newView.setOnLongClickListener(this);
-					newView.setOnTouchListener(this);
+					//					newView.setOnClickListener(this);
+					//					newView.setOnLongClickListener(this);
+					//					newView.setOnTouchListener(this);
 					if(ghostMode)
 						newView.setAlpha(30);
 					//					nextMove(reader) ;
@@ -1309,12 +1362,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		currentTouchMode = TouchMode.MOVE ;
 		ghostMode = false ;
 		studentMode = false ;
-		
+		DragController.setMoveNo(0);
+
 		if(studentMode)
 			setTitle("Virtual Labs - Student Mode");
 		else
 			setTitle("Virtual Labs - Teacher/Admin Mode");
-		
+
 	}
 
 	public void addObject(View v)
@@ -1375,6 +1429,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	private class scaleListener implements SeekBar.OnSeekBarChangeListener {
 
+		float originalScale ;
+
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
 			// Log the progress
@@ -1391,7 +1447,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//            yourTextView.setText(""+progress);
 		}
 
-		public void onStartTrackingTouch(SeekBar seekBar) {}
+		public void onStartTrackingTouch(SeekBar seekBar) {
+			originalScale = objectSelectedForScaleRotate.getLayoutParams().height ;
+			trace("Origianal Value = " + originalScale) ;
+		}
 
 		public void onStopTrackingTouch(SeekBar seekBar) {
 
@@ -1423,6 +1482,63 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+				}
+				else
+				{
+					int imageId ;
+					float scaleRead ;
+					String[] RowData = null;
+					int i = 0 ;
+
+					FileInputStream fis = null ;
+
+					try {
+						fis = openFileInput("media") ;
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return ;
+					}
+
+					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+					try {
+						String line;
+						while(i < DragController.getMoveNo())
+						{
+							line = reader.readLine() ;
+							i++ ;
+						}
+						if ((line = reader.readLine()) != null) 
+						{
+
+							RowData = line.split(",");
+							if(RowData[0].charAt(0) != 's')
+							{
+								if(RowData[0].charAt(0) == 'a')
+									DragController.setMoveNo(DragController.getMoveNo()+1);
+								return ;
+							}
+
+							imageId = Integer.parseInt(RowData[1]);
+							scaleRead = Float.parseFloat(RowData[2]) ; 
+
+							trace("scale Read " + scaleRead) ;
+							trace("height " + objectSelectedForScaleRotate.getLayoutParams().height) ;
+
+							if((objectSelectedForScaleRotate.getLayoutParams().height - scaleRead) > (0.01)*screenMetrics.heightPixels)
+							{
+								scaleAbsolute(objectSelectedForScaleRotate,originalScale);
+								return ;
+							}
+
+							scaleAbsolute(objectSelectedForScaleRotate,scaleRead);
+						}
+					}
+					catch (IOException ex)
+					{
+					}
+
 				}
 			}
 		}
