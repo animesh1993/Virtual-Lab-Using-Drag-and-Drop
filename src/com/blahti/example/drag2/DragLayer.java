@@ -36,188 +36,193 @@ import android.widget.Toast;
  * that were done in a separate Workspace class in the Launcher.
  */
 public class DragLayer extends MyAbsoluteLayout 
-    implements DragSource, DropTarget
+implements DragSource, DropTarget
 {
-    DragController mDragController;
+	private boolean allowDrag = true ;
+	DragController mDragController;
 
-    /**
-     * Used to create a new DragLayer from XML.
-     *
-     * @param context The application's context.
-     * @param attrs The attribtues set containing the Workspace's customization values.
-     */
-    public DragLayer (Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+	/**
+	 * Used to create a new DragLayer from XML.
+	 *
+	 * @param context The application's context.
+	 * @param attrs The attribtues set containing the Workspace's customization values.
+	 */
+	public DragLayer (Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
 
-    public void setDragController(DragController controller) {
-        mDragController = controller;
-    }
-    
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        return mDragController.dispatchKeyEvent(event) || super.dispatchKeyEvent(event);
-    }
+	public void setDragController(DragController controller) {
+		mDragController = controller;
+	}
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return mDragController.onInterceptTouchEvent(ev);
-    }
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		return mDragController.dispatchKeyEvent(event) || super.dispatchKeyEvent(event);
+	}
 
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        return mDragController.onTouchEvent(ev);
-    }
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		return mDragController.onInterceptTouchEvent(ev);
+	}
 
-    @Override
-    public boolean dispatchUnhandledMove(View focused, int direction) {
-        return mDragController.dispatchUnhandledMove(focused, direction);
-    }
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		return mDragController.onTouchEvent(ev);
+	}
 
-/**
- */
-// DragSource interface methods
+	@Override
+	public boolean dispatchUnhandledMove(View focused, int direction) {
+		return mDragController.dispatchUnhandledMove(focused, direction);
+	}
 
-/**
- * This method is called to determine if the DragSource has something to drag.
- * 
- * @return True if there is something to drag
- */
+	/**
+	 */
+	 // DragSource interface methods
 
-public boolean allowDrag () {
-    // In this simple demo, any view that you touch can be dragged.
-    return true;
-}
+	 /**
+	  * This method is called to determine if the DragSource has something to drag.
+	  * 
+	  * @return True if there is something to drag
+	  */
 
-/**
- * setDragController
- *
- */
+	public void setAllowDrag(boolean value)
+	{
+		allowDrag = value ;
+	}
+	public boolean allowDrag () {
+		// In this simple demo, any view that you touch can be dragged.
+		return allowDrag;
+	}
 
- /* setDragController is already defined. See above. */
+	/**
+	 * setDragController
+	 *
+	 */
 
-/**
- * onDropCompleted
- *
- */
+	/* setDragController is already defined. See above. */
 
-public void onDropCompleted (View target, boolean success)
-{
-    toast ("DragLayer2.onDropCompleted: " + target.getId () + " Check that the view moved.");
-}
+	/**
+	 * onDropCompleted
+	 *
+	 */
 
-/**
- */
-// DropTarget interface implementation
+	public void onDropCompleted (View target, boolean success)
+	{
+		toast ("DragLayer2.onDropCompleted: " + target.getId () + " Check that the view moved.");
+	}
 
-/**
- * Handle an object being dropped on the DropTarget.
- * This is the where a dragged view gets repositioned at the end of a drag.
- * 
- * @param source DragSource where the drag started
- * @param x X coordinate of the drop location
- * @param y Y coordinate of the drop location
- * @param xOffset Horizontal offset with the object being dragged where the original
- *          touch happened
- * @param yOffset Vertical offset with the object being dragged where the original
- *          touch happened
- * @param dragView The DragView that's being dragged around on screen.
- * @param dragInfo Data associated with the object being dragged
- * 
- */
-public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset,
-        DragView dragView, Object dragInfo)
-{
-    View v = (View) dragInfo;
-    toast ("DragLayer2.onDrop accepts view: " + v.getId ()
-          + "x, y, xO, yO :" + new Integer (x) + ", " + new Integer (y) + ", "
-          + new Integer (xOffset) + ", " + new Integer (yOffset));
+	/**
+	 */
+	// DropTarget interface implementation
 
-    int w = v.getWidth ();
-    int h = v.getHeight ();
-    int left = x - xOffset;
-    int top = y - yOffset;
-    DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
-    this.updateViewLayout(v, lp);
-}
+	/**
+	 * Handle an object being dropped on the DropTarget.
+	 * This is the where a dragged view gets repositioned at the end of a drag.
+	 * 
+	 * @param source DragSource where the drag started
+	 * @param x X coordinate of the drop location
+	 * @param y Y coordinate of the drop location
+	 * @param xOffset Horizontal offset with the object being dragged where the original
+	 *          touch happened
+	 * @param yOffset Vertical offset with the object being dragged where the original
+	 *          touch happened
+	 * @param dragView The DragView that's being dragged around on screen.
+	 * @param dragInfo Data associated with the object being dragged
+	 * 
+	 */
+	public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset,
+			DragView dragView, Object dragInfo)
+	{
+		View v = (View) dragInfo;
+		toast ("DragLayer2.onDrop accepts view: " + v.getId ()
+				+ "x, y, xO, yO :" + new Integer (x) + ", " + new Integer (y) + ", "
+				+ new Integer (xOffset) + ", " + new Integer (yOffset));
 
-public void onDragEnter(DragSource source, int x, int y, int xOffset, int yOffset,
-        DragView dragView, Object dragInfo)
-{
-}
+		int w = v.getWidth ();
+		int h = v.getHeight ();
+		int left = x - xOffset;
+		int top = y - yOffset;
+		DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+		this.updateViewLayout(v, lp);
+	}
 
-public void onDragOver(DragSource source, int x, int y, int xOffset, int yOffset,
-        DragView dragView, Object dragInfo)
-{
-}
+	public void onDragEnter(DragSource source, int x, int y, int xOffset, int yOffset,
+			DragView dragView, Object dragInfo)
+	{
+	}
 
-public void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset,
-        DragView dragView, Object dragInfo)
-{
-}
+	public void onDragOver(DragSource source, int x, int y, int xOffset, int yOffset,
+			DragView dragView, Object dragInfo)
+	{
+	}
 
-/**
- * Check if a drop action can occur at, or near, the requested location.
- * This may be called repeatedly during a drag, so any calls should return
- * quickly.
- * 
- * @param source DragSource where the drag started
- * @param x X coordinate of the drop location
- * @param y Y coordinate of the drop location
- * @param xOffset Horizontal offset with the object being dragged where the
- *            original touch happened
- * @param yOffset Vertical offset with the object being dragged where the
- *            original touch happened
- * @param dragView The DragView that's being dragged around on screen.
- * @param dragInfo Data associated with the object being dragged
- * @return True if the drop will be accepted, false otherwise.
- */
-public boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset,
-        DragView dragView, Object dragInfo)
-{
-    return true;
-}
+	public void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset,
+			DragView dragView, Object dragInfo)
+	{
+	}
 
-/**
- * Estimate the surface area where this object would land if dropped at the
- * given location.
- * 
- * @param source DragSource where the drag started
- * @param x X coordinate of the drop location
- * @param y Y coordinate of the drop location
- * @param xOffset Horizontal offset with the object being dragged where the
- *            original touch happened
- * @param yOffset Vertical offset with the object being dragged where the
- *            original touch happened
- * @param dragView The DragView that's being dragged around on screen.
- * @param dragInfo Data associated with the object being dragged
- * @param recycle {@link Rect} object to be possibly recycled.
- * @return Estimated area that would be occupied if object was dropped at
- *         the given location. Should return null if no estimate is found,
- *         or if this target doesn't provide estimations.
- */
-public Rect estimateDropLocation(DragSource source, int x, int y, int xOffset, int yOffset,
-            DragView dragView, Object dragInfo, Rect recycle)
-{
-    return null;
-}
+	/**
+	 * Check if a drop action can occur at, or near, the requested location.
+	 * This may be called repeatedly during a drag, so any calls should return
+	 * quickly.
+	 * 
+	 * @param source DragSource where the drag started
+	 * @param x X coordinate of the drop location
+	 * @param y Y coordinate of the drop location
+	 * @param xOffset Horizontal offset with the object being dragged where the
+	 *            original touch happened
+	 * @param yOffset Vertical offset with the object being dragged where the
+	 *            original touch happened
+	 * @param dragView The DragView that's being dragged around on screen.
+	 * @param dragInfo Data associated with the object being dragged
+	 * @return True if the drop will be accepted, false otherwise.
+	 */
+	public boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset,
+			DragView dragView, Object dragInfo)
+	{
+		return true;
+	}
 
-/**
- */
-// More methods
+	/**
+	 * Estimate the surface area where this object would land if dropped at the
+	 * given location.
+	 * 
+	 * @param source DragSource where the drag started
+	 * @param x X coordinate of the drop location
+	 * @param y Y coordinate of the drop location
+	 * @param xOffset Horizontal offset with the object being dragged where the
+	 *            original touch happened
+	 * @param yOffset Vertical offset with the object being dragged where the
+	 *            original touch happened
+	 * @param dragView The DragView that's being dragged around on screen.
+	 * @param dragInfo Data associated with the object being dragged
+	 * @param recycle {@link Rect} object to be possibly recycled.
+	 * @return Estimated area that would be occupied if object was dropped at
+	 *         the given location. Should return null if no estimate is found,
+	 *         or if this target doesn't provide estimations.
+	 */
+	public Rect estimateDropLocation(DragSource source, int x, int y, int xOffset, int yOffset,
+			DragView dragView, Object dragInfo, Rect recycle)
+	{
+		return null;
+	}
 
-/**
- * Show a string on the screen via Toast.
- * 
- * @param msg String
- * @return void
- */
+	/**
+	 */
+	// More methods
 
-public void toast (String msg)
-{
-    if (!DragActivityV2.Debugging) return;
-    Toast.makeText (getContext (), msg, Toast.LENGTH_SHORT).show ();
-} // end toast
+	/**
+	 * Show a string on the screen via Toast.
+	 * 
+	 * @param msg String
+	 * @return void
+	 */
+
+	public void toast (String msg)
+	{
+		if (!DragActivityV2.Debugging) return;
+		Toast.makeText (getContext (), msg, Toast.LENGTH_SHORT).show ();
+	} // end toast
 
 
 } // end class
