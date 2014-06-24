@@ -153,16 +153,18 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			"Resistor",
 			"Text",
 			"Line",
-			"Cancel"
 	} ;
+//			"Cancel"
+//	} ;
 	Integer[] imageId = {
 			R.drawable.battery,
 			R.drawable.bulb,
 			R.drawable.resistor,
 			R.drawable.text_icon,
 			R.drawable.line_icon,
-			R.drawable.cancel_icon
 	};
+//			R.drawable.cancel_icon
+//	};
 
 	/**
 	 */
@@ -340,9 +342,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			}
 
 			public void onStartTrackingTouch(SeekArc seekArc) {
-				originalRotate = objectSelectedForScaleRotate.getRotation() ;
-				trace("Inside onStart") ;
-				trace("Inside originalRotate" + originalRotate) ;
+				if(objectSelectedForScaleRotate!=null)
+				{
+					originalRotate = objectSelectedForScaleRotate.getRotation() ;
+					trace("Inside onStart") ;
+					trace("Inside originalRotate" + originalRotate) ;
+				}
 			}
 
 			public void onStopTrackingTouch(SeekArc seekArc) {
@@ -847,6 +852,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	public boolean onTouch (final View v, MotionEvent ev) 
 	{	
+		if(v.getId() == R.id.blankBackground && findViewById(R.id.list).getVisibility() == View.VISIBLE)
+			findViewById(R.id.list).setVisibility(View.INVISIBLE);
 		if(deleteMode == true && (v.getId() != R.id.blankBackground))
 		{
 			objectSelectedForDelete =  v ;
