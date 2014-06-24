@@ -132,6 +132,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	public int lineInitialY = 0 ;
 	BufferedReader reader = null ;
 	public static boolean fileEndReached = false ;
+	View objectSelectedForDelete = null ;
+	public static boolean deleteMode = false ;
 	//	public boolean lineMode = false ;
 
 	public enum TouchMode
@@ -442,6 +444,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		//		findViewById(R.id.blankBackground).setAlpha(100);
 		findViewById(R.id.blankBackground).setBackgroundColor(Color.BLACK) ;
+		findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
 		//		((ImageView)findViewById(R.id.blankBackground)).setImageResource(R.drawable.blank_white_shape);
 		//		findViewById(R.id.blankBackground).setAlpha(0);
 
@@ -801,7 +804,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			{
 				findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.modeRadioGroup).setVisibility(View.INVISIBLE);
-//				findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
+				//				findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.stepModeToggle).setVisibility(View.INVISIBLE);
 				findViewById(R.id.ghostModeToggle).setVisibility(View.INVISIBLE);
@@ -811,7 +814,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			{
 				findViewById(R.id.addButton).setVisibility(View.VISIBLE);
 				findViewById(R.id.modeRadioGroup).setVisibility(View.VISIBLE);
-//				findViewById(R.id.playButton).setVisibility(View.VISIBLE);
+				//				findViewById(R.id.playButton).setVisibility(View.VISIBLE);
 				findViewById(R.id.resetButton).setVisibility(View.VISIBLE);
 				findViewById(R.id.stepModeToggle).setVisibility(View.VISIBLE);
 				findViewById(R.id.ghostModeToggle).setVisibility(View.VISIBLE);
@@ -842,8 +845,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	 */    
 
 	public boolean onTouch (final View v, MotionEvent ev) 
-	{
-		if(currentTouchMode == TouchMode.LINE && ev.getAction() == MotionEvent.ACTION_DOWN)
+	{	
+		if(deleteMode == true && (v.getId() != R.id.blankBackground))
+		{
+			objectSelectedForDelete =  v ;
+			return true ;
+		}
+		else if(currentTouchMode == TouchMode.LINE && ev.getAction() == MotionEvent.ACTION_DOWN)
 		{
 			trace("Entered onTouch with touchmodeline") ;
 			//			Canvas canvas = new Canvas();
@@ -1186,24 +1194,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				//				nextMove(reader);
 				if(!stepMode)
 				{
-					FileInputStream fis = null ;
-
-					try {
-						fis = openFileInput("media") ;
-					} catch (FileNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-						toast("Error: File not found") ;
-						return ;
-					}
-
-					//					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 					char movePer ;
 					do
 					{
 						movePer = nextMove(reader) ;
 					}while(movePer!='m') ;
-
 				}
 
 			}
@@ -1605,6 +1600,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		studentMode = false ;
 		DragController.setMoveNo(0);
 		fileEndReached = false ;
+		deleteMode = false ;
+		objectSelectedForDelete = null ;
 
 		if(studentMode)
 			setTitle("Virtual Labs - Student Mode");
@@ -1653,11 +1650,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		case R.id.moveRadioButton:
 			if (checked)
 			{
+				deleteMode = false ;
 				toast("Move Mode") ;
 				currentTouchMode = TouchMode.MOVE ;
 				//				objectSelectedForScaleRotate = null ;
 				findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
+				findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
 				if(objectSelectedForScaleRotate!=null)
 					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(0, 0, 0, 0));
 			}
@@ -1673,15 +1672,24 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		case R.id.scaleRadioButton:
 			if(checked)
 			{
+				deleteMode = false ;
 				toast("Touch the object to scale and rotate");
 				currentTouchMode = TouchMode.SCALE ;
 				findViewById(R.id.seekArc).setVisibility(View.VISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.VISIBLE);
+				findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.seekArc).bringToFront();
 				findViewById(R.id.scaleBar).bringToFront();
 				if(objectSelectedForScaleRotate!=null)
 					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(100, 255, 0, 0));
 				//				objectSelectedForScaleRotate = objectSelectedForScaleRotate ;
+			}
+			break ;
+		case R.id.deleteRadioButton:
+			if(checked)
+			{
+				deleteMode = true ;
+				findViewById(R.id.deleteButton).setVisibility(View.VISIBLE);
 			}
 			break ;
 		}
@@ -1962,5 +1970,48 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		//		if(studentMode)
 		//			lineImage.setAlpha(20);
+	}
+
+	public void deleteObject(View V)
+	{
+		if(objectSelectedForDelete!=null)
+		{
+			AlertDialog confirmBox = deleteConfirmation();
+			confirmBox.show();
+		}
+		else
+		{
+			toast("No object selected for delete");
+		}
+	}
+	private AlertDialog deleteConfirmation()
+	{
+		AlertDialog myQuittingDialogBox =new AlertDialog.Builder(this) 
+		//set message, title, and icon
+		.setTitle("Delete") 
+		.setMessage("Are you sure you want to delete ?") 
+		//		.setIcon(R.drawable.delete_confirmation)
+
+		.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int whichButton) { 
+				objectSelectedForDelete.setVisibility(View.GONE);
+				dialog.dismiss();
+			}   
+
+		})
+
+
+
+		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+
+				dialog.dismiss();
+
+			}
+		})
+		.create();
+		return myQuittingDialogBox;
+
 	}
 } // end class

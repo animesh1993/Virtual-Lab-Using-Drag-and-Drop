@@ -43,6 +43,13 @@
                 android:layout_height="wrap_content"
                 android:onClick="modeRadioClick"
                 android:text="Scale/Rotate" />
+
+            <RadioButton
+                android:id="@+id/deleteRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="modeRadioClick"
+                android:text="Delete" />
         </RadioGroup>
 
         <com.blahti.example.drag2.VerticalSeekBar
@@ -125,10 +132,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:contentDescription="Reset Button"
+                android:onClick="reset"
                 android:scaleType="centerInside"
-                android:src="@drawable/reset_button"
-                android:onClick="reset" />
+                android:src="@drawable/reset_button" />
 
+            <ImageButton
+                android:id="@+id/deleteButton"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:contentDescription="Delete Button"
+                android:onClick="deleteObject"
+                android:scaleType="centerInside"
+                android:src="@drawable/delete_confirmation" />
         </LinearLayout>
 
         <ListView
@@ -138,9 +154,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/buttonContainer" >
-
         </ListView>
-
     </RelativeLayout>
 
 </com.blahti.example.drag2.DragLayer>
