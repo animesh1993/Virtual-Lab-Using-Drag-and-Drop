@@ -16,6 +16,7 @@ import java.nio.Buffer;
 import android.widget.SeekBar;
 
 import com.blahti.example.drag2.R;
+import com.blahti.example.drag2.R.color;
 import com.blahti.example.drag2.SeekArc.OnSeekArcChangeListener;
 
 import android.annotation.SuppressLint;
@@ -129,6 +130,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	public boolean firstTouchForLine = false ;
 	public int lineInitialX = 0 ;
 	public int lineInitialY = 0 ;
+	BufferedReader reader = null ;
+	public static boolean fileEndReached = false ;
 	//	public boolean lineMode = false ;
 
 	public enum TouchMode
@@ -143,17 +146,17 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	ListView list;
 	String[] equipmentItems = {
-			"Burrete",
-			"Beaker",
-			"TestTube",
+			"Battery",
+			"Bulb",
+			"Resistor",
 			"Text",
 			"Line",
 			"Cancel"
 	} ;
 	Integer[] imageId = {
-			R.drawable.burrete,
-			R.drawable.beaker,
-			R.drawable.testtube,
+			R.drawable.battery,
+			R.drawable.bulb,
+			R.drawable.resistor,
 			R.drawable.text_icon,
 			R.drawable.line_icon,
 			R.drawable.cancel_icon
@@ -208,9 +211,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					else
 					{
 						currentTouchMode = TouchMode.LINE ;
-//						ImageView lineImage = (ImageView) findViewById(R.id.blankBackground) ;
-//						createLine(lineImage, 0, 0, 1000, 1000, Color.GREEN);
-//						createLine(lineImage, 0, 0, 500, 0, Color.RED);
+						//						ImageView lineImage = (ImageView) findViewById(R.id.blankBackground) ;
+						//						createLine(lineImage, 0, 0, 1000, 1000, Color.GREEN);
+						//						createLine(lineImage, 0, 0, 500, 0, Color.RED);
+						//						findViewById(R.id.blankBackground).bringToFront();
 					}
 					trace("CurrentTouchMode set to " + currentTouchMode) ;
 					return ;
@@ -222,13 +226,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				switch(which)
 				{
 				case 0:
-					newView.setImageResource(R.drawable.burrete);
+					newView.setImageResource(R.drawable.battery);
 					break ;
 				case 1:
-					newView.setImageResource(R.drawable.beaker);
+					newView.setImageResource(R.drawable.bulb);
 					break ;
 				case 2:
-					newView.setImageResource(R.drawable.testtube);
+					newView.setImageResource(R.drawable.resistor);
 					break ;
 				case 3:
 					//Text Box insertion
@@ -273,7 +277,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				newView.setOnClickListener((OnClickListener) objectDef);
 				newView.setOnLongClickListener((OnLongClickListener) objectDef);
 				newView.setOnTouchListener((OnTouchListener) objectDef);
-//				newView.bringToFront();
+				//				newView.bringToFront();
 
 				scaleAbsolute(newView, 50);
 				//				newView.setAlpha(30);
@@ -355,7 +359,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						try {
 							fos.close();
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -428,9 +431,26 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			setTitle("Virtual Labs - Student Mode");
 		else
 			setTitle("Virtual Labs - Teacher/Admin Mode");
-		
-//		findViewById(R.id.blankBackground).setAlpha(100);
-//		findViewById(R.id.blankBackground).setBackgroundColor(Color.WHITE) ;
+
+		//		findViewById(R.id.blankBackground).setAlpha(100);
+		findViewById(R.id.blankBackground).setBackgroundColor(Color.BLACK) ;
+		//		((ImageView)findViewById(R.id.blankBackground)).setImageResource(R.drawable.blank_white_shape);
+		//		findViewById(R.id.blankBackground).setAlpha(0);
+
+		FileInputStream fis = null ;
+
+		try {
+			fis = openFileInput("media") ;
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			//			e1.printStackTrace();
+			toast("Error: File Not Found") ;
+			trace("File Error");
+			return ;
+		}
+
+		reader = new BufferedReader(new InputStreamReader(fis));
+
 	}
 	/**
 	 * Build a menu for the activity.
@@ -818,17 +838,17 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		if(currentTouchMode == TouchMode.LINE && ev.getAction() == MotionEvent.ACTION_DOWN)
 		{
 			trace("Entered onTouch with touchmodeline") ;
-//			Canvas canvas = new Canvas();
-//			Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-//			paint.setColor(R.color.red);
-//			TextView line = new TextView(this);
-//			line.setBackgroundResource(android.R.color.holo_red_dark);
-//			line.setHeight((int)convertDpToPixel(1,this));
-			
+			//			Canvas canvas = new Canvas();
+			//			Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			//			paint.setColor(R.color.red);
+			//			TextView line = new TextView(this);
+			//			line.setBackgroundResource(android.R.color.holo_red_dark);
+			//			line.setHeight((int)convertDpToPixel(1,this));
+
 			if(!firstTouchForLine)
 			{
-				lineInitialX = (int) ev.getX() ;
-				lineInitialY = (int) ev.getY() ;
+				lineInitialX = (int) ev.getRawX() ;
+				lineInitialY = (int) ev.getRawY() - 40 ;
 				trace("lineInitialx set to " + lineInitialX) ;
 				firstTouchForLine = true ;
 			}
@@ -836,17 +856,43 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			{
 				trace("Came into createLIne") ;
 				ImageView lineImage = (ImageView) findViewById(R.id.blankBackground) ;
-				createLine(lineImage, lineInitialX, lineInitialY, ev.getX(), ev.getY(), Color.GREEN);
-				trace("Created line " + lineInitialX  + "," + lineInitialY + " " + ev.getX() + "," + ev.getY()) ;
+				createLine(lineImage, lineInitialX, lineInitialY, ev.getRawX(), (ev.getRawY()-40), Color.GREEN);
+				trace("Created line " + lineInitialX  + "," + lineInitialY + " " + ev.getRawX() + "," + (ev.getRawY()-40)) ;
 				currentTouchMode = TouchMode.MOVE ;
 				firstTouchForLine = false ;
-//				createLine(lineImage, 0, 0, 500, 0, Color.RED);
+
+				if(!studentMode)
+				{
+					FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+
+					try {
+						fos.write(("l" + "," + lineInitialX + "," + lineInitialY + "," + ev.getRawX() + "," + (ev.getRawY()-40) + "\n").getBytes());
+
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				//				createLine(lineImage, 0, 0, 500, 0, Color.RED);
 			}
 			return true ;
 		}
-		else if (((currentTouchMode == TouchMode.SCALE) || (currentTouchMode == TouchMode.ROTATE)) && ev.getAction() == MotionEvent.ACTION_DOWN && !(v != findViewById(R.id.blankBackground))) 
+		else if (((currentTouchMode == TouchMode.SCALE) || (currentTouchMode == TouchMode.ROTATE)) && ev.getAction() == MotionEvent.ACTION_DOWN && (v != findViewById(R.id.blankBackground))) 
 		{
-			
+
 			trace("Entered onTouch with if") ;
 
 			objectSelectedForScaleRotate = v ;
@@ -969,11 +1015,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		}
 		else if(currentTouchMode == TouchMode.MOVE)
 		{
-			
+
 			trace("Entered onTouch with else") ;
 			boolean handledHere = false;
 			final int action = ev.getAction();
-			
+
 			// In the situation where a long click is not needed to initiate a drag, simply start on the down event.
 			if (action == MotionEvent.ACTION_DOWN && (v.getId() != R.id.blankBackground)) {
 				handledHere = startDrag (v);
@@ -1019,11 +1065,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		mDragLayer = (DragLayer) findViewById(R.id.drag_layer);
 		mDragLayer.setDragController(dragController);
-//		mDragLayer.setAllowDrag(true);
-//		mDragLayer.setOnTouchListener(this);
+		//		mDragLayer.setAllowDrag(true);
+		//		mDragLayer.setOnTouchListener(this);
 		dragController.addDropTarget (mDragLayer);
 		findViewById(R.id.blankBackground).setOnTouchListener(this) ;
-//		findViewById(R.id.blankBackground).setOnTouchListener(this);
+		//		findViewById(R.id.blankBackground).setOnTouchListener(this);
 
 		//		ImageView lineImage = (ImageView) findViewById(R.id.blankBackground) ;
 		//		trace("lineImage Height" + lineImage.getHeight() + "") ;
@@ -1143,8 +1189,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						return ;
 					}
 
-					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-					nextMove(reader)  ;
+					//					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+					char movePer ;
+					do
+					{
+						movePer = nextMove(reader) ;
+					}while(movePer!='m') ;
 
 				}
 
@@ -1164,19 +1214,23 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		int imageAdded = 0 ;
 		float rotate = 0 ;
 		float scale = 0;
-		int i = 1 ;
+		//		int i = 1 ;
 		int w,h,left,top ;
 		String textRead = "";
 		DragLayer.LayoutParams lp ;
 		try {
 			String line;
-			while(i < lineNo)
-			{
-				line = reader.readLine() ;
-				i++ ;
-			}
+			//			trace("line NO " + lineNo) ;
+			//			while(i < lineNo)
+			//			{
+			//				line = reader.readLine() ;
+			//				i++ ;
+			//				
+			//			}
 			if ((line = reader.readLine()) != null) 
 			{
+				trace("line Read" + line) ;
+				//				reader.mark(4096);
 
 				RowData = line.split(",");
 				switch(RowData[0].charAt(0))
@@ -1188,13 +1242,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					switch(imageAdded)
 					{
 					case 0:
-						newView.setImageResource(R.drawable.burrete);
+						newView.setImageResource(R.drawable.battery);
 						break ;
 					case 1:
-						newView.setImageResource(R.drawable.beaker);
+						newView.setImageResource(R.drawable.bulb);
 						break ;
 					case 2:
-						newView.setImageResource(R.drawable.testtube);
+						newView.setImageResource(R.drawable.resistor);
 						break ;
 					default:
 						break ;	
@@ -1242,6 +1296,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					rotate = Float.parseFloat(RowData[2]) ;
 
 					((ImageView)findViewById(imageId)).setRotation(rotate);
+					caseRead = 'r' ;
 					break ;
 
 				case 's':
@@ -1257,6 +1312,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					//					((ImageView)findViewById(imageId)).getLayoutParams().width *= scaleDec ;
 					//					((ImageView)findViewById(imageId)).setLayoutParams(((ImageView)findViewById(imageId)).getLayoutParams());
 					scaleAbsolute(findViewById(imageId), scale);
+					caseRead = 's' ;
 					break ;
 				case 't':
 					textRead = RowData[1] ;
@@ -1276,28 +1332,39 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					tv.setOnLongClickListener((OnLongClickListener) this);
 					tv.setOnTouchListener((OnTouchListener) this);
 					tv.setId(imageId);
+					caseRead = 't' ;
 					break ;
+				case 'l':
+					initX = Float.parseFloat(RowData[1]) ;
+					initY = Float.parseFloat(RowData[2]);
+					finX = Float.parseFloat(RowData[3]) ;
+					finY = Float.parseFloat(RowData[4]);
 
-
-
-
-
+					createLine((ImageView)findViewById(R.id.blankBackground), initX, initY, finX, finY, Color.GREEN);
+					caseRead = 'l' ;
+					break ;
 				}
 
+				//				line = reader.readLine() ;
+				//				if(line!=null)
+				//				{
+				//					RowData = line.split(",");
+				//					caseRead = RowData[0].charAt(0) ;
+				//				}
+				//				reader.reset();
+			}
+			else
+			{
+				fileEndReached = true ;
 			}
 		}
-		catch (IOException ex) {
+		catch (IOException ex) 
+		{
 		}
 		finally 
 		{
 			lineNo++ ;
 		}
-
-		//		if(caseRead == 'a')
-		//		{
-		//			nextMove(reader) ;
-		//		}
-
 		return caseRead; 
 	}
 
@@ -1452,23 +1519,42 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	public void playBack(View v)
 	{
-
-		FileInputStream fis = null ;
-
-		try {
-			fis = openFileInput("media") ;
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			//			e1.printStackTrace();
-			toast("Error: File Not Found") ;
-			trace("File Error");
+		if(reader==null)
+		{
+			trace("File Not Found Error - Provide File and Reset") ;
 			return ;
 		}
+		if(!fileEndReached)
+		{	
+			//			FileInputStream fis = null ;
+			//
+			//			try {
+			//				fis = openFileInput("media") ;
+			//			} catch (FileNotFoundException e1) {
+			//				// TODO Auto-generated catch block
+			//				//			e1.printStackTrace();
+			//				toast("Error: File Not Found") ;
+			//				trace("File Error");
+			//				return ;
+			//			}
 
-		//		trace("Error Reaching wrong code");
+			//		trace("Error Reaching wrong code");
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-		nextMove(reader);
+			char movePerformed ;
+
+			//			reader = new BufferedReader(new InputStreamReader(fis));
+			if(!stepMode)
+			{
+				do
+				{
+					movePerformed = nextMove(reader) ;
+				}while(movePerformed!='m') ;
+			}
+			else
+			{
+				nextMove(reader) ;
+			}
+		}
 	}
 
 	public void reset(View v)
@@ -1482,12 +1568,26 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		ghostMode = false ;
 		studentMode = false ;
 		DragController.setMoveNo(0);
+		fileEndReached = false ;
 
 		if(studentMode)
 			setTitle("Virtual Labs - Student Mode");
 		else
 			setTitle("Virtual Labs - Teacher/Admin Mode");
 
+		FileInputStream fis = null ;
+
+		try {
+			fis = openFileInput("media") ;
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			//			e1.printStackTrace();
+			toast("Error: File Not Found") ;
+			trace("File Error");
+			return ;
+		}
+
+		reader = new BufferedReader(new InputStreamReader(fis));
 	}
 
 	public void addObject(View v)
@@ -1519,9 +1619,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			{
 				toast("Move Mode") ;
 				currentTouchMode = TouchMode.MOVE ;
-				objectSelectedForScaleRotate = null ;
+				//				objectSelectedForScaleRotate = null ;
 				findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
+				if(objectSelectedForScaleRotate!=null)
+					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(0, 0, 0, 0));
 			}
 
 			break;
@@ -1541,6 +1643,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				findViewById(R.id.scaleBar).setVisibility(View.VISIBLE);
 				findViewById(R.id.seekArc).bringToFront();
 				findViewById(R.id.scaleBar).bringToFront();
+				if(objectSelectedForScaleRotate!=null)
+					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(100, 255, 0, 0));
+				//				objectSelectedForScaleRotate = objectSelectedForScaleRotate ;
 			}
 			break ;
 		}
@@ -1568,7 +1673,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			originalScale = objectSelectedForScaleRotate.getLayoutParams().height ;
-			trace("Origianal Value = " + originalScale) ;
+			trace("Original Value = " + originalScale) ;
 		}
 
 		public void onStopTrackingTouch(SeekBar seekBar) {
@@ -1807,12 +1912,19 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		Bitmap bmp = Bitmap.createBitmap(lineImage.getWidth(), lineImage.getHeight(), Config.ARGB_8888);
 		Canvas c = new Canvas(bmp);
-		lineImage.draw(c);
+		//		c.drawColor(Color.BLACK) ;
+		lineImage.draw(c); 
 
 		Paint p = new Paint();
 		p.setColor(color);
 		p.setStrokeWidth(5);
+		p.setAntiAlias(true);
+		if(studentMode)
+			p.setAlpha(150);
 		c.drawLine(x, y, xEnd, yEnd, p);
 		lineImage.setImageBitmap(bmp);
+
+		//		if(studentMode)
+		//			lineImage.setAlpha(20);
 	}
 } // end class
