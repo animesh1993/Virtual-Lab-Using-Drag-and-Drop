@@ -153,7 +153,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/buttonContainer" >
+            android:layout_toRightOf="@+id/buttonContainer"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="5dp"
+            android:gravity="center" >
         </ListView>
     </RelativeLayout>
 

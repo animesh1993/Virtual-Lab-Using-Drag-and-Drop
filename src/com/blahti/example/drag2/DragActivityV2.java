@@ -243,8 +243,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					break ;	
 				}
 
-				//				if(!studentMode)
-				newView.setId(IDGen.generateViewId());
+				if(!studentMode)
+					newView.setId(IDGen.generateViewId());
 
 				if(!studentMode)
 				{
@@ -275,6 +275,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					if(ghostMode)
 					{
 						playBackForGhostMode(null) ;
+						DragController.setMoveNo(DragController.getMoveNo() + 1 );
 					}
 				}
 
@@ -1029,7 +1030,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			 */
 			return true ;
 		}
-		else if(currentTouchMode == TouchMode.MOVE)
+		else if(currentTouchMode == TouchMode.MOVE )
 		{
 
 			trace("Entered onTouch with else") ;
@@ -1039,9 +1040,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			// In the situation where a long click is not needed to initiate a drag, simply start on the down event.
 			if (action == MotionEvent.ACTION_DOWN && (v.getId() != R.id.blankBackground)) {
 				handledHere = startDrag (v);
+				objectSelectedForScaleRotate = v ;
 			}
 
-			objectSelectedForScaleRotate = v ;
+
 
 			return handledHere;
 		}
@@ -1345,6 +1347,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 					createLine((ImageView)findViewById(R.id.blankBackground), initX, initY, finX, finY, Color.GREEN);
 					caseRead = 'l' ;
+					break ;
+				case 'd':
+					imageId = Integer.parseInt(RowData[1]) ;
+					trace("Delete" + " id " + imageId) ;
+					findViewById(imageId).setVisibility(View.GONE);
 					break ;
 				}
 
@@ -1984,6 +1991,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			toast("No object selected for delete");
 		}
 	}
+
 	private AlertDialog deleteConfirmation()
 	{
 		AlertDialog myQuittingDialogBox =new AlertDialog.Builder(this) 
@@ -1996,6 +2004,29 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 			public void onClick(DialogInterface dialog, int whichButton) { 
 				objectSelectedForDelete.setVisibility(View.GONE);
+
+				if(!studentMode)
+				{
+					FileOutputStream fos = null;
+					try {
+						fos = openFileOutput("media", MODE_APPEND);
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+
+					try {
+						fos.write(("d" + "," + objectSelectedForDelete.getId() + "\n").getBytes());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					try {
+						fos.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 				dialog.dismiss();
 			}   
 

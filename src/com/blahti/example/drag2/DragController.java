@@ -607,7 +607,7 @@ public class DragController {
 							{
 								movePer = ((DragActivityV2)mContext).playBackForGhostMode(null) ;
 								moveNo++ ;
-								while(movePer == 'l')
+								while(movePer == 'l' || movePer == 't')
 								{
 									movePer = ((DragActivityV2)mContext).playBackForGhostMode(null) ;
 									moveNo++ ;
@@ -615,7 +615,7 @@ public class DragController {
 							}
 							while( movePer== 'r'  
 									|| movePer == 's'
-									|| movePer =='t');
+									|| movePer == 'd');
 //							moveNo++ ;
 						}
 					}
