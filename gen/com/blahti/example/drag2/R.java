@@ -206,9 +206,9 @@ containing a value of this type.
         public static final int transparent_without_border=0x7f020021;
     }
     public static final class id {
-        public static final int Image1=0x7f080013;
-        public static final int Image2=0x7f080014;
-        public static final int Text1=0x7f080012;
+        public static final int Image1=0x7f080014;
+        public static final int Image2=0x7f080015;
+        public static final int Text1=0x7f080013;
         public static final int addButton=0x7f08000e;
         public static final int blankBackground=0x7f080003;
         public static final int buttonContainer=0x7f08000c;
@@ -222,6 +222,7 @@ containing a value of this type.
         public static final int moveRadioButton=0x7f080005;
         public static final int playButton=0x7f08000d;
         public static final int resetButton=0x7f08000f;
+        public static final int rotateValueText=0x7f080012;
         public static final int scaleBar=0x7f080008;
         public static final int scaleRadioButton=0x7f080006;
         public static final int seekArc=0x7f08000a;

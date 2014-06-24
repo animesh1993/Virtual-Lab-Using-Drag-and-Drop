@@ -330,6 +330,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			public void onProgressChanged(SeekArc seekArc, int progress,
 					boolean fromUser) {
 				// Log the progress
+				((TextView)findViewById(R.id.rotateValueText)).setText(progress+"");
 				Log.d("DEBUG", "Progress is: "+progress);
 				float rotate = progress ;
 				if(objectSelectedForScaleRotate!=null)
@@ -467,6 +468,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		}
 
 		reader = new BufferedReader(new InputStreamReader(fis));
+		findViewById(R.id.seekArc).setRotation(0);
+		findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
 
 	}
 	/**
@@ -1671,6 +1674,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
 				findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
 				if(objectSelectedForScaleRotate!=null)
 					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(0, 0, 0, 0));
 			}
@@ -1692,6 +1696,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				findViewById(R.id.seekArc).setVisibility(View.VISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.VISIBLE);
 				findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.rotateValueText).setVisibility(View.VISIBLE);
 				findViewById(R.id.seekArc).bringToFront();
 				findViewById(R.id.scaleBar).bringToFront();
 				if(objectSelectedForScaleRotate!=null)
@@ -1704,6 +1709,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			{
 				deleteMode = true ;
 				findViewById(R.id.deleteButton).setVisibility(View.VISIBLE);
+				findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
+				findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
+				findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
+				findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
 			}
 			break ;
 		}

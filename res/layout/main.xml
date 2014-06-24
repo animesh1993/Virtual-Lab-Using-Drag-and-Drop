@@ -158,6 +158,19 @@
             android:dividerHeight="5dp"
             android:gravity="center" >
         </ListView>
+
+        <TextView
+            android:id="@+id/rotateValueText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/seekArc"
+            android:layout_alignLeft="@+id/seekArc"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/seekArc"
+            android:text="0"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
     </RelativeLayout>
 
 </com.blahti.example.drag2.DragLayer>
