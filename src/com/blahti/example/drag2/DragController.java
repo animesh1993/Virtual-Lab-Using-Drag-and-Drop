@@ -602,7 +602,21 @@ public class DragController {
 							
 							
 							drop(finX + mTouchOffsetX, finY + mTouchOffsetY);
-							moveNo++ ;
+							char movePer ;
+							do
+							{
+								movePer = ((DragActivityV2)mContext).playBackForGhostMode(null) ;
+								moveNo++ ;
+								while(movePer == 'l')
+								{
+									movePer = ((DragActivityV2)mContext).playBackForGhostMode(null) ;
+									moveNo++ ;
+								}
+							}
+							while( movePer== 'r'  
+									|| movePer == 's'
+									|| movePer =='t');
+//							moveNo++ ;
 						}
 					}
 					catch (IOException ex)

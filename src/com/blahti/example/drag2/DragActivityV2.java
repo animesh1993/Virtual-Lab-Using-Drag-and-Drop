@@ -241,6 +241,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					break ;	
 				}
 
+				//				if(!studentMode)
 				newView.setId(IDGen.generateViewId());
 
 				if(!studentMode)
@@ -267,6 +268,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						e.printStackTrace();
 					}
 				}
+				else
+				{
+					if(ghostMode)
+					{
+						playBackForGhostMode(null) ;
+					}
+				}
 
 				int w = 60;
 				int h = 60;
@@ -279,7 +287,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				newView.setOnTouchListener((OnTouchListener) objectDef);
 				//				newView.bringToFront();
 
-				scaleAbsolute(newView, 50);
+				//				scaleAbsolute(newView, 50);
 				//				newView.setAlpha(30);
 
 				//				list.setVisibility(View.INVISIBLE);
@@ -793,7 +801,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			{
 				findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.modeRadioGroup).setVisibility(View.INVISIBLE);
-				//				findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
+//				findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.stepModeToggle).setVisibility(View.INVISIBLE);
 				findViewById(R.id.ghostModeToggle).setVisibility(View.INVISIBLE);
@@ -803,7 +811,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			{
 				findViewById(R.id.addButton).setVisibility(View.VISIBLE);
 				findViewById(R.id.modeRadioGroup).setVisibility(View.VISIBLE);
-				//				findViewById(R.id.playButton).setVisibility(View.VISIBLE);
+//				findViewById(R.id.playButton).setVisibility(View.VISIBLE);
 				findViewById(R.id.resetButton).setVisibility(View.VISIBLE);
 				findViewById(R.id.stepModeToggle).setVisibility(View.VISIBLE);
 				findViewById(R.id.ghostModeToggle).setVisibility(View.VISIBLE);
@@ -1555,6 +1563,34 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				nextMove(reader) ;
 			}
 		}
+	}
+
+	public char playBackForGhostMode(View v)
+	{
+		if(reader==null)
+		{
+			trace("File Not Found Error - Provide File and Reset") ;
+			return 'z';
+		}
+		if(!fileEndReached)
+		{	
+			//			FileInputStream fis = null ;
+			//
+			//			try {
+			//				fis = openFileInput("media") ;
+			//			} catch (FileNotFoundException e1) {
+			//				// TODO Auto-generated catch block
+			//				//			e1.printStackTrace();
+			//				toast("Error: File Not Found") ;
+			//				trace("File Error");
+			//				return ;
+			//			}
+
+			//		trace("Error Reaching wrong code");
+			return nextMove(reader) ;
+		}
+
+		return 'z' ;
 	}
 
 	public void reset(View v)

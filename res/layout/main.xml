@@ -101,11 +101,20 @@
             android:orientation="vertical" >
 
             <ImageButton
+                android:id="@+id/playButton"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:contentDescription="Play Button"
+                android:onClick="playBack"
+                android:scaleType="centerInside"
+                android:src="@drawable/play_button" />
+
+            <ImageButton
                 android:id="@+id/addButton"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_alignParentBottom="true"
                 android:onClick="addObject"
                 android:scaleType="centerInside"
                 android:src="@drawable/add_button_icon" />
@@ -116,19 +125,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:contentDescription="Reset Button"
-                android:onClick="reset"
                 android:scaleType="centerInside"
-                android:src="@drawable/reset_button" />
+                android:src="@drawable/reset_button"
+                android:onClick="reset" />
 
-            <ImageButton
-                android:id="@+id/playButton"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:contentDescription="Play Button"
-                android:onClick="playBack"
-                android:scaleType="centerInside"
-                android:src="@drawable/play_button" />
         </LinearLayout>
 
         <ListView
@@ -137,10 +137,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/buttonContainer"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="5dp" >
+            android:layout_toRightOf="@+id/buttonContainer" >
+
         </ListView>
+
     </RelativeLayout>
 
 </com.blahti.example.drag2.DragLayer>

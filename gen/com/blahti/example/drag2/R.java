@@ -208,7 +208,7 @@ containing a value of this type.
         public static final int Image1=0x7f080011;
         public static final int Image2=0x7f080012;
         public static final int Text1=0x7f080010;
-        public static final int addButton=0x7f08000c;
+        public static final int addButton=0x7f08000d;
         public static final int blankBackground=0x7f080003;
         public static final int buttonContainer=0x7f08000b;
         public static final int drag_layer=0x7f080002;
@@ -217,8 +217,8 @@ containing a value of this type.
         public static final int list=0x7f08000f;
         public static final int modeRadioGroup=0x7f080004;
         public static final int moveRadioButton=0x7f080005;
-        public static final int playButton=0x7f08000e;
-        public static final int resetButton=0x7f08000d;
+        public static final int playButton=0x7f08000c;
+        public static final int resetButton=0x7f08000e;
         public static final int scaleBar=0x7f080007;
         public static final int scaleRadioButton=0x7f080006;
         public static final int seekArc=0x7f080009;
