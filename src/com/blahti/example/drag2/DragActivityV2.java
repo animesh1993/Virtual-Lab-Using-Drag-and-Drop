@@ -19,6 +19,7 @@ import com.blahti.example.drag2.R;
 import com.blahti.example.drag2.R.color;
 import com.blahti.example.drag2.SeekArc.OnSeekArcChangeListener;
 
+import android.R.bool;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -40,6 +41,7 @@ import android.media.Image;
 import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
@@ -55,6 +57,7 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView.ScaleType;
@@ -134,6 +137,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	public static boolean fileEndReached = false ;
 	View objectSelectedForDelete = null ;
 	public static boolean deleteMode = false ;
+	private static boolean answeredCorrect = false;
 	//	public boolean lineMode = false ;
 
 	public enum TouchMode
@@ -290,6 +294,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				newView.setOnClickListener((OnClickListener) objectDef);
 				newView.setOnLongClickListener((OnLongClickListener) objectDef);
 				newView.setOnTouchListener((OnTouchListener) objectDef);
+				
+				MyAbsoluteLayout.LayoutParams lpMove = (MyAbsoluteLayout.LayoutParams) newView.getLayoutParams();
+				lpMove.x = (int)(0.3 * screenMetrics.widthPixels) ;
+				lp.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
+				newView.setLayoutParams(lp);
 				//				newView.bringToFront();
 
 				//				scaleAbsolute(newView, 50);
@@ -357,10 +366,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 				if(objectSelectedForScaleRotate != null)
 				{	
+					trace("Entered onStopTrackingTouch") ;
 					float rotate = seekArc.getProgress() ;
 
 					if(!studentMode)
 					{
+						trace("Entered non student mode of rotate") ;
 						FileOutputStream fos = null;
 						try {
 							fos = openFileOutput("media", MODE_APPEND);
@@ -383,10 +394,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					}
 					else
 					{
+						trace("Entered student mode of rotate") ;
 						int imageId ;
 						float rotateRead ;
 						String[] RowData = null;
-						int i = 0 ;
+						int i = 1 ;
 
 						FileInputStream fis = null ;
 
@@ -400,21 +412,25 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 						BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 
+						//						reader = DragController.reader ;
 						try {
-							String line;
+							String line = null;
 							while(i < DragController.getMoveNo())
 							{
 								line = reader.readLine() ;
+								//								trace("line read inside rotate = " + line) ;
 								i++ ;
 							}
+							//							trace("Line after while in rotate" + line);
 							if ((line = reader.readLine()) != null) 
 							{
-
+								trace("line compared in rotateObject "  + line) ;
 								RowData = line.split(",");
 								if(RowData[0].charAt(0) != 'r')
 								{
 									if(RowData[0].charAt(0) == 'a')
 										DragController.setMoveNo(DragController.getMoveNo()+1);
+									objectSelectedForScaleRotate.setRotation(originalRotate);
 									return ;
 								}
 
@@ -431,6 +447,16 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 								}
 
 								objectSelectedForScaleRotate.setRotation(rotateRead);
+								DragController.setMoveNo(DragController.getMoveNo()+1);
+								if(ghostMode)
+								{
+									playBackForGhostMode(null) ;
+									//									DragController.setMoveNo(DragController.getMoveNo() + 1 );
+								}	
+							}
+							else
+							{
+								objectSelectedForScaleRotate.setRotation(originalRotate);
 							}
 						}
 						catch (IOException ex)
@@ -472,6 +498,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		reader = new BufferedReader(new InputStreamReader(fis));
 		findViewById(R.id.seekArc).setRotation(0);
 		findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
+		//		DragController.resetReader(); 
 
 	}
 	/**
@@ -1224,6 +1251,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	@SuppressWarnings("deprecation")
 	public char nextMove(BufferedReader reader)
 	{
+		Object thisObj = this ;
 		int imageId ;
 		char caseRead = 'm'; 
 		float initX, finX, initY, finY ;
@@ -1234,6 +1262,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//		int i = 1 ;
 		int w,h,left,top ;
 		String textRead = "";
+		String quesRead = "" ;
+		String ansRead = "" ;
+		//		boolean answeredCorrect = false ;
 		DragLayer.LayoutParams lp ;
 		try {
 			String line;
@@ -1246,7 +1277,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//			}
 			if ((line = reader.readLine()) != null) 
 			{
-				trace("line Read" + line) ;
+				trace("line Read in nextMove " + line) ;
 				//				reader.mark(4096);
 
 				RowData = line.split(",");
@@ -1364,6 +1395,112 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					imageId = Integer.parseInt(RowData[1]) ;
 					trace("Delete" + " id " + imageId) ;
 					findViewById(imageId).setVisibility(View.GONE);
+					break ;
+				case 'q':
+					caseRead = 'q' ;
+					quesRead = RowData[1] ;
+					ansRead = RowData[2] ;
+
+					final String ansComp = ansRead ;
+
+					if(studentMode)
+					{
+						//						do
+						//						{
+
+						final EditText input = new EditText((Context) thisObj);
+						//						alert.setView(input);
+						final AlertDialog d = new AlertDialog.Builder((Context) thisObj)
+						.setView(input)
+						.setTitle(quesRead)
+						.setMessage(quesRead)
+						.setPositiveButton(android.R.string.ok, null) //Set to null. We override the onclick
+						//				        .setNegativeButton(android.R.string.cancel, null)
+						.create();
+
+						d.setOnShowListener(new DialogInterface.OnShowListener() {
+
+							@Override
+							public void onShow(DialogInterface dialog) {
+
+								Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
+								b.setOnClickListener(new View.OnClickListener() {
+
+									@Override
+									public void onClick(View view) {
+										//										d.dismiss(); 
+										Editable value = input.getText();
+										trace("Got text = " + value);
+										trace("ansComp = " + ansComp) ;
+										trace("Value equals ansComp = " + value.toString().equalsIgnoreCase(ansComp)) ;
+										if(value.toString().equalsIgnoreCase(ansComp))
+										{
+											DragController.setMoveNo(DragController.getMoveNo() + 1);
+											playBackForGhostMode(null) ;
+											d.dismiss(); 
+										}
+										else
+										{
+											toast("Wrong -- Enter again");
+										}
+
+
+										// TODO Do something
+
+										//Dismiss once everything is OK.
+										//				                d.dismiss();
+									}
+								});
+							}
+						});
+
+						d.show(); 
+
+						//							AlertDialog.Builder alert = new AlertDialog.Builder((Context) thisObj);
+						//
+						//							alert.setTitle("Question");
+						//							alert.setMessage(quesRead);
+						//
+						//							// Set an EditText view to get user input 
+						//							final EditText input = new EditText((Context) thisObj);
+						//							alert.setView(input);
+						//
+						//							alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+						//								public void onClick(DialogInterface dialog, int whichButton) {
+						//									Editable value = input.getText();
+						//									if(value.equals(ansComp))
+						//										answeredCorrect = true ;
+						//									else
+						//										{
+						//										answeredCorrect = false ;
+						//										}
+						//
+						//
+						//								}
+						//							});
+						//
+						//							alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						//								public void onClick(DialogInterface dialog, int whichButton) {
+						//									// Canceled.
+						//								}
+						//							});
+						//
+						//							alert.show();
+						////						}while(!answeredCorrect) ;
+					}
+					//					else
+					//					{
+					//						trace("Entered q else with ques " + quesRead + " ans " + ansRead) ;
+					//					}
+
+					//					if(answeredCorrect)
+					//					{
+					//						answeredCorrect = false ; 
+					//						DragController.setMoveNo(DragController.getMoveNo() + 1);
+					//						playBackForGhostMode(null) ;
+					//					}
+					//					else
+					//						trace("Answered Wrong") ;
 					break ;
 				}
 
@@ -1609,37 +1746,41 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	public void reset(View v)
 	{
-		onCreate(null);
-		lineNo = 1 ;
-		mLongClickStartsDrag = false ;
-		stepMode = false ;
-		objectSelectedForScaleRotate = null ;
-		currentTouchMode = TouchMode.MOVE ;
-		ghostMode = false ;
-		studentMode = false ;
-		DragController.setMoveNo(0);
-		fileEndReached = false ;
-		deleteMode = false ;
-		objectSelectedForDelete = null ;
+		AlertDialog confirmBox = resetConfirmation();
+		confirmBox.show();
 
-		if(studentMode)
-			setTitle("Virtual Labs - Student Mode");
-		else
-			setTitle("Virtual Labs - Teacher/Admin Mode");
-
-		FileInputStream fis = null ;
-
-		try {
-			fis = openFileInput("media") ;
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			//			e1.printStackTrace();
-			toast("Error: File Not Found") ;
-			trace("File Error");
-			return ;
-		}
-
-		reader = new BufferedReader(new InputStreamReader(fis));
+		//		onCreate(null);
+		//		lineNo = 1 ;
+		//		mLongClickStartsDrag = false ;
+		//		stepMode = false ;
+		//		objectSelectedForScaleRotate = null ;
+		//		currentTouchMode = TouchMode.MOVE ;
+		//		ghostMode = false ;
+		//		studentMode = false ;
+		//		DragController.setMoveNo(0);
+		//		fileEndReached = false ;
+		//		deleteMode = false ;
+		//		objectSelectedForDelete = null ;
+		////		DragController.resetReader();
+		//
+		//		if(studentMode)
+		//			setTitle("Virtual Labs - Student Mode");
+		//		else
+		//			setTitle("Virtual Labs - Teacher/Admin Mode");
+		//
+		//		FileInputStream fis = null ;
+		//
+		//		try {
+		//			fis = openFileInput("media") ;
+		//		} catch (FileNotFoundException e1) {
+		//			// TODO Auto-generated catch block
+		//			//			e1.printStackTrace();
+		//			toast("Error: File Not Found") ;
+		//			trace("File Error");
+		//			return ;
+		//		}
+		//
+		//		reader = new BufferedReader(new InputStreamReader(fis));
 	}
 
 	public void addObject(View v)
@@ -1791,7 +1932,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					int imageId ;
 					float scaleRead ;
 					String[] RowData = null;
-					int i = 0 ;
+					int i = 1 ;
 
 					FileInputStream fis = null ;
 
@@ -1804,7 +1945,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					}
 
 					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
-
+					//					reader = DragController.reader ;
 					try {
 						String line;
 						while(i < DragController.getMoveNo())
@@ -1814,12 +1955,15 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						}
 						if ((line = reader.readLine()) != null) 
 						{
+							trace("Line Compared in Scale" + line) ;
 
 							RowData = line.split(",");
 							if(RowData[0].charAt(0) != 's')
 							{
 								if(RowData[0].charAt(0) == 'a')
 									DragController.setMoveNo(DragController.getMoveNo()+1);
+
+								scaleAbsolute(objectSelectedForScaleRotate,originalScale);
 								return ;
 							}
 
@@ -1836,6 +1980,17 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 							}
 
 							scaleAbsolute(objectSelectedForScaleRotate,scaleRead);
+							DragController.setMoveNo(DragController.getMoveNo()+1);
+
+							if(ghostMode)
+							{
+								playBackForGhostMode(null) ;
+								//								DragController.setMoveNo(DragController.getMoveNo() + 1 );
+							}
+						}
+						else
+						{
+							scaleAbsolute(objectSelectedForScaleRotate,originalScale);
 						}
 					}
 					catch (IOException ex)
@@ -2054,6 +2209,68 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						e.printStackTrace();
 					}
 				}
+				dialog.dismiss();
+			}   
+
+		})
+
+
+
+		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+
+				dialog.dismiss();
+
+			}
+		})
+		.create();
+		return myQuittingDialogBox;
+
+	}
+
+	private AlertDialog resetConfirmation()
+	{
+		AlertDialog myQuittingDialogBox =new AlertDialog.Builder(this) 
+		//set message, title, and icon
+		.setTitle("Reset") 
+		.setMessage("Are you sure you want to reset ?") 
+		//		.setIcon(R.drawable.delete_confirmation)
+
+		.setPositiveButton("Reset", new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int whichButton) { 
+				onCreate(null);
+				lineNo = 1 ;
+				mLongClickStartsDrag = false ;
+				stepMode = false ;
+				objectSelectedForScaleRotate = null ;
+				currentTouchMode = TouchMode.MOVE ;
+				ghostMode = false ;
+				studentMode = false ;
+				DragController.setMoveNo(0);
+				fileEndReached = false ;
+				deleteMode = false ;
+				objectSelectedForDelete = null ;
+				//				DragController.resetReader();
+
+				if(studentMode)
+					setTitle("Virtual Labs - Student Mode");
+				else
+					setTitle("Virtual Labs - Teacher/Admin Mode");
+
+				FileInputStream fis = null ;
+
+				try {
+					fis = openFileInput("media") ;
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					//			e1.printStackTrace();
+					toast("Error: File Not Found") ;
+					trace("File Error");
+					return ;
+				}
+
+				reader = new BufferedReader(new InputStreamReader(fis));
 				dialog.dismiss();
 			}   
 

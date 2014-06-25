@@ -58,6 +58,13 @@ import java.io.InputStreamReader;
  */
 
 public class DragController {
+	
+//	public static BufferedReader reader = null ;
+//	
+//	public static void resetReader()
+//	{
+//		reader = null ;
+//	}
 
 	private static int moveNo = 1 ;
 
@@ -520,7 +527,7 @@ public class DragController {
 					int imageId ;
 					float initX, finX, initY, finY ;
 					String[] RowData = null;
-					int i = 0 ;
+					int i = 1 ;
 
 					FileInputStream fis = null ;
 
@@ -532,6 +539,7 @@ public class DragController {
 						return false;
 					}
 
+					//BufferedReader 
 					BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 
 					try {
@@ -613,9 +621,8 @@ public class DragController {
 									moveNo++ ;
 								}
 							}
-							while( movePer== 'r'  
-									|| movePer == 's'
-									|| movePer == 'd');
+							while(movePer == 'd'
+									|| movePer == 'q');
 //							moveNo++ ;
 						}
 					}
