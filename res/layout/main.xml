@@ -52,14 +52,39 @@
                 android:text="Delete" />
         </RadioGroup>
 
-        <com.blahti.example.drag2.VerticalSeekBar
-            android:id="@+id/scaleBar"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/verticalSeekBarContainer"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_above="@+id/stepModeToggle"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:max="100" />
+            android:orientation="vertical" >
+            
+            <ImageView
+                android:id="@+id/plusSignImage"
+                android:layout_width="match_parent"
+                android:layout_height="18dp"
+                android:src="@drawable/plus_icon" />
+
+            <ImageView
+                android:id="@+id/minusSignImage"
+                android:layout_width="match_parent"
+                android:layout_height="18dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/minus_icon" />
+
+            <com.blahti.example.drag2.VerticalSeekBar
+                android:id="@+id/scaleBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/minusSignImage"
+                android:layout_below="@+id/plusSignImage"
+                android:layout_centerHorizontal="true"
+                android:max="100" />
+
+        </RelativeLayout>
 
         <com.blahti.example.drag2.SeekArc
             android:id="@+id/seekArc"
@@ -69,7 +94,7 @@
             android:layout_alignLeft="@+id/modeRadioGroup"
             android:layout_alignParentTop="true"
             android:layout_gravity="center"
-            android:layout_toLeftOf="@+id/scaleBar"
+            android:layout_toLeftOf="@+id/verticalSeekBarContainer"
             android:padding="30dp"
             seekarc:rotation="180"
             seekarc:startAngle="0"
@@ -167,10 +192,9 @@
             android:layout_alignLeft="@+id/seekArc"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/seekArc"
-            android:text="0"
             android:gravity="center"
+            android:text="0"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
     </RelativeLayout>
 
 </com.blahti.example.drag2.DragLayer>

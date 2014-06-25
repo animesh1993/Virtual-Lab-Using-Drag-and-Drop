@@ -154,8 +154,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			"Text",
 			"Line",
 	} ;
-//			"Cancel"
-//	} ;
+	//			"Cancel"
+	//	} ;
 	Integer[] imageId = {
 			R.drawable.battery,
 			R.drawable.bulb,
@@ -163,8 +163,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			R.drawable.text_icon,
 			R.drawable.line_icon,
 	};
-//			R.drawable.cancel_icon
-//	};
+	//			R.drawable.cancel_icon
+	//	};
 
 	/**
 	 */
@@ -313,6 +313,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		//		findViewById(R.id.rotateBar).setVisibility(View.INVISIBLE);
 		findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
+		findViewById(R.id.plusSignImage).setVisibility(View.INVISIBLE);
+		findViewById(R.id.minusSignImage).setVisibility(View.INVISIBLE);
 		findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
 		buttonsVisible = true ;
 		stepMode = false ;
@@ -1673,6 +1675,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				//				objectSelectedForScaleRotate = null ;
 				findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
+				findViewById(R.id.plusSignImage).setVisibility(View.INVISIBLE);
+				findViewById(R.id.minusSignImage).setVisibility(View.INVISIBLE);
 				findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
 				if(objectSelectedForScaleRotate!=null)
@@ -1695,10 +1699,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				currentTouchMode = TouchMode.SCALE ;
 				findViewById(R.id.seekArc).setVisibility(View.VISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.VISIBLE);
+				findViewById(R.id.plusSignImage).setVisibility(View.VISIBLE);
+				findViewById(R.id.minusSignImage).setVisibility(View.VISIBLE);
 				findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.rotateValueText).setVisibility(View.VISIBLE);
 				findViewById(R.id.seekArc).bringToFront();
 				findViewById(R.id.scaleBar).bringToFront();
+				findViewById(R.id.plusSignImage).bringToFront();
+				findViewById(R.id.minusSignImage).bringToFront();
 				if(objectSelectedForScaleRotate!=null)
 					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(100, 255, 0, 0));
 				//				objectSelectedForScaleRotate = objectSelectedForScaleRotate ;
@@ -1712,7 +1720,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
 				findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
-				findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
+				findViewById(R.id.plusSignImage).setVisibility(View.INVISIBLE);
+				findViewById(R.id.minusSignImage).setVisibility(View.INVISIBLE);
 				findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
 			}
 			break ;
@@ -1740,7 +1749,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		}
 
 		public void onStartTrackingTouch(SeekBar seekBar) {
-			originalScale = objectSelectedForScaleRotate.getLayoutParams().height ;
+			if(objectSelectedForScaleRotate!=null)
+				originalScale = objectSelectedForScaleRotate.getLayoutParams().height ;
 			trace("Original Value = " + originalScale) ;
 		}
 
