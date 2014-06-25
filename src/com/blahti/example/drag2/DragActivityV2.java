@@ -297,7 +297,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				
 				MyAbsoluteLayout.LayoutParams lpMove = (MyAbsoluteLayout.LayoutParams) newView.getLayoutParams();
 				lpMove.x = (int)(0.3 * screenMetrics.widthPixels) ;
-				lp.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
+				lpMove.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
 				newView.setLayoutParams(lp);
 				//				newView.bringToFront();
 
@@ -1315,6 +1315,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					if(ghostMode)
 						newView.setAlpha(30);
 					//					nextMove(reader) ;
+					
+					MyAbsoluteLayout.LayoutParams lpMove = (MyAbsoluteLayout.LayoutParams) newView.getLayoutParams();
+					lpMove.x = (int)(0.3 * screenMetrics.widthPixels) ;
+					lpMove.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
+					newView.setLayoutParams(lp);
 
 					caseRead = 'a' ;
 					break ;
