@@ -621,8 +621,7 @@ public class DragController {
 									moveNo++ ;
 								}
 							}
-							while(movePer == 'd'
-									|| movePer == 'q');
+							while(movePer == 'd');
 //							moveNo++ ;
 						}
 					}

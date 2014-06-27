@@ -33,6 +33,8 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Bitmap.Config;
+import android.graphics.Paint.Align;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.display.DisplayManager;
@@ -46,6 +48,7 @@ import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -137,7 +140,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	public static boolean fileEndReached = false ;
 	View objectSelectedForDelete = null ;
 	public static boolean deleteMode = false ;
-	private static boolean answeredCorrect = false;
+//	private static boolean answeredCorrect = false;
 	//	public boolean lineMode = false ;
 
 	public enum TouchMode
@@ -294,11 +297,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				newView.setOnClickListener((OnClickListener) objectDef);
 				newView.setOnLongClickListener((OnLongClickListener) objectDef);
 				newView.setOnTouchListener((OnTouchListener) objectDef);
-				
+
 				MyAbsoluteLayout.LayoutParams lpMove = (MyAbsoluteLayout.LayoutParams) newView.getLayoutParams();
 				lpMove.x = (int)(0.3 * screenMetrics.widthPixels) ;
 				lpMove.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
-				newView.setLayoutParams(lp);
+				newView.setLayoutParams(lpMove);
 				//				newView.bringToFront();
 
 				//				scaleAbsolute(newView, 50);
@@ -405,7 +408,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						try {
 							fis = openFileInput("media") ;
 						} catch (FileNotFoundException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 							return ;
 						}
@@ -882,6 +884,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	 *
 	 */    
 
+	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouch (final View v, MotionEvent ev) 
 	{	
 		if(v.getId() == R.id.blankBackground && findViewById(R.id.list).getVisibility() == View.VISIBLE)
@@ -1251,7 +1254,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	@SuppressWarnings("deprecation")
 	public char nextMove(BufferedReader reader)
 	{
-		Object thisObj = this ;
+		final Object thisObj = this ;
 		int imageId ;
 		char caseRead = 'm'; 
 		float initX, finX, initY, finY ;
@@ -1261,7 +1264,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		float scale = 0;
 		//		int i = 1 ;
 		int w,h,left,top ;
-		String textRead = "";
 		String quesRead = "" ;
 		String ansRead = "" ;
 		//		boolean answeredCorrect = false ;
@@ -1315,11 +1317,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					if(ghostMode)
 						newView.setAlpha(30);
 					//					nextMove(reader) ;
-					
+
 					MyAbsoluteLayout.LayoutParams lpMove = (MyAbsoluteLayout.LayoutParams) newView.getLayoutParams();
 					lpMove.x = (int)(0.3 * screenMetrics.widthPixels) ;
 					lpMove.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
-					newView.setLayoutParams(lp);
+					newView.setLayoutParams(lpMove);
 
 					caseRead = 'a' ;
 					break ;
@@ -1368,24 +1370,138 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					caseRead = 's' ;
 					break ;
 				case 't':
-					textRead = RowData[1] ;
-					imageId = Integer.parseInt(RowData[2]) ;
+					//					textRead = RowData[1] ;
+					//					imageId = Integer.parseInt(RowData[2]) ;
 
-					TextView tv = new TextView(this);
-					//					trace(m_Text) ;
-					tv.setText(textRead);
+					imageId = Integer.parseInt(RowData[1]);
+					quesRead = RowData[2] ;
+					ansRead = RowData[3] ;
 
-					w = 60;
-					h = 60;
-					left = 80;
-					top = 100;
-					lp = new DragLayer.LayoutParams (w, h, left, top);
-					mDragLayer.addView (tv, lp);
-					tv.setOnClickListener((OnClickListener) this);
-					tv.setOnLongClickListener((OnLongClickListener) this);
-					tv.setOnTouchListener((OnTouchListener) this);
-					tv.setId(imageId);
-					caseRead = 't' ;
+					if(quesRead.isEmpty())
+					{
+						TextView tv = new TextView(this);
+						//					trace(m_Text) ;
+						tv.setText(ansRead);
+
+						//					w = 60;
+						//					h = 60;
+						//					left = 80;
+						//					top = 100;
+						//					lp = new DragLayer.LayoutParams (w, h, left, top);
+						mDragLayer.addView (tv);
+						tv.setOnClickListener((OnClickListener) this);
+						tv.setOnLongClickListener((OnLongClickListener) this);
+						tv.setOnTouchListener((OnTouchListener) this);
+						tv.setId(imageId);
+
+						MyAbsoluteLayout.LayoutParams lpText = (MyAbsoluteLayout.LayoutParams) tv.getLayoutParams();
+						lpText.x = (int)(0.3 * screenMetrics.widthPixels) ;
+						lpText.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
+						tv.setLayoutParams(lpText);
+						caseRead = 't' ;
+					}
+					else
+					{
+						final String ansComp = ansRead ;
+						final int imageIdFinal = imageId ;
+
+						if(studentMode)
+						{
+							//						do
+							//						{
+
+							final EditText input = new EditText((Context) thisObj);
+							//						alert.setView(input);
+							final AlertDialog d = new AlertDialog.Builder((Context) thisObj)
+							.setView(input)
+							.setTitle(quesRead)
+							.setMessage(quesRead)
+							.setPositiveButton(android.R.string.ok, null) //Set to null. We override the onclick
+							//				        .setNegativeButton(android.R.string.cancel, null)
+							.create();
+
+							d.setCancelable(false);
+							d.setCanceledOnTouchOutside(false);
+							d.setOnShowListener(new DialogInterface.OnShowListener() {
+
+								@Override
+								public void onShow(DialogInterface dialog) {
+
+									Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
+									b.setOnClickListener(new View.OnClickListener() {
+
+										@Override
+										public void onClick(View view) {
+											//										d.dismiss(); 
+											Editable value = input.getText();
+											trace("Got text = " + value);
+											trace("ansComp = " + ansComp) ;
+											trace("Value equals ansComp = " + value.toString().equalsIgnoreCase(ansComp)) ;
+											if(value.toString().equalsIgnoreCase(ansComp))
+											{
+												DragController.setMoveNo(DragController.getMoveNo() + 1);
+
+												TextView tv = new TextView((Context) thisObj);
+												//					trace(m_Text) ;
+												tv.setText(ansComp);
+
+												//					w = 60;
+												//					h = 60;
+												//					left = 80;
+												//					top = 100;
+												//					lp = new DragLayer.LayoutParams (w, h, left, top);
+												mDragLayer.addView (tv);
+												tv.setOnClickListener((OnClickListener) thisObj);
+												tv.setOnLongClickListener((OnLongClickListener) thisObj);
+												tv.setOnTouchListener((OnTouchListener) thisObj);
+												tv.setId(imageIdFinal);
+
+												MyAbsoluteLayout.LayoutParams lpText = (MyAbsoluteLayout.LayoutParams) tv.getLayoutParams();
+												lpText.x = (int)(0.3 * screenMetrics.widthPixels) ;
+												lpText.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
+												tv.setLayoutParams(lpText);
+
+												playBackForGhostMode(null) ;
+												d.dismiss(); 
+											}
+											else
+											{
+												toast("Wrong -- Enter again");
+												input.setText("");
+												input.setHint("Wrong Answer - Enter Again"); 
+											}
+										}
+									});
+								}
+							});
+
+							d.show(); 
+							caseRead = 'q' ;
+						}
+						else
+						{
+							TextView tv = new TextView(this);
+							//					trace(m_Text) ;
+							tv.setText(ansRead);
+
+							//					w = 60;
+							//					h = 60;
+							//					left = 80;
+							//					top = 100;
+							//					lp = new DragLayer.LayoutParams (w, h, left, top);
+							mDragLayer.addView (tv);
+							tv.setOnClickListener((OnClickListener) this);
+							tv.setOnLongClickListener((OnLongClickListener) this);
+							tv.setOnTouchListener((OnTouchListener) this);
+							tv.setId(imageId);
+
+							MyAbsoluteLayout.LayoutParams lpText = (MyAbsoluteLayout.LayoutParams) tv.getLayoutParams();
+							lpText.x = (int)(0.3 * screenMetrics.widthPixels) ;
+							lpText.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
+							tv.setLayoutParams(lpText);
+							caseRead = 't' ;
+						}
+					}
 					break ;
 				case 'l':
 					initX = Float.parseFloat(RowData[1]) ;
@@ -1401,112 +1517,100 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					trace("Delete" + " id " + imageId) ;
 					findViewById(imageId).setVisibility(View.GONE);
 					break ;
-				case 'q':
-					caseRead = 'q' ;
-					quesRead = RowData[1] ;
-					ansRead = RowData[2] ;
-
-					final String ansComp = ansRead ;
-
-					if(studentMode)
+				case 'c':
+					imageId = Integer.parseInt(RowData[1]) ;
+					int imageNoChange = Integer.parseInt(RowData[3]) ;
+					
+					switch(imageNoChange)
 					{
-						//						do
-						//						{
-
-						final EditText input = new EditText((Context) thisObj);
-						//						alert.setView(input);
-						final AlertDialog d = new AlertDialog.Builder((Context) thisObj)
-						.setView(input)
-						.setTitle(quesRead)
-						.setMessage(quesRead)
-						.setPositiveButton(android.R.string.ok, null) //Set to null. We override the onclick
-						//				        .setNegativeButton(android.R.string.cancel, null)
-						.create();
-
-						d.setOnShowListener(new DialogInterface.OnShowListener() {
-
-							@Override
-							public void onShow(DialogInterface dialog) {
-
-								Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
-								b.setOnClickListener(new View.OnClickListener() {
-
-									@Override
-									public void onClick(View view) {
-										//										d.dismiss(); 
-										Editable value = input.getText();
-										trace("Got text = " + value);
-										trace("ansComp = " + ansComp) ;
-										trace("Value equals ansComp = " + value.toString().equalsIgnoreCase(ansComp)) ;
-										if(value.toString().equalsIgnoreCase(ansComp))
-										{
-											DragController.setMoveNo(DragController.getMoveNo() + 1);
-											playBackForGhostMode(null) ;
-											d.dismiss(); 
-										}
-										else
-										{
-											toast("Wrong -- Enter again");
-										}
-
-
-										// TODO Do something
-
-										//Dismiss once everything is OK.
-										//				                d.dismiss();
-									}
-								});
-							}
-						});
-
-						d.show(); 
-
-						//							AlertDialog.Builder alert = new AlertDialog.Builder((Context) thisObj);
-						//
-						//							alert.setTitle("Question");
-						//							alert.setMessage(quesRead);
-						//
-						//							// Set an EditText view to get user input 
-						//							final EditText input = new EditText((Context) thisObj);
-						//							alert.setView(input);
-						//
-						//							alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-						//								public void onClick(DialogInterface dialog, int whichButton) {
-						//									Editable value = input.getText();
-						//									if(value.equals(ansComp))
-						//										answeredCorrect = true ;
-						//									else
-						//										{
-						//										answeredCorrect = false ;
-						//										}
-						//
-						//
-						//								}
-						//							});
-						//
-						//							alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-						//								public void onClick(DialogInterface dialog, int whichButton) {
-						//									// Canceled.
-						//								}
-						//							});
-						//
-						//							alert.show();
-						////						}while(!answeredCorrect) ;
+					case 0:
+						((ImageView)findViewById(imageId)).setImageResource(R.drawable.battery);
+						break ;
+					case 1:
+						((ImageView)findViewById(imageId)).setImageResource(R.drawable.bulb);
+						break ;
+					case 2:
+						((ImageView)findViewById(imageId)).setImageResource(R.drawable.resistor);
+						break ;
+					default:
+						break ;	
 					}
-					//					else
-					//					{
-					//						trace("Entered q else with ques " + quesRead + " ans " + ansRead) ;
-					//					}
-
-					//					if(answeredCorrect)
-					//					{
-					//						answeredCorrect = false ; 
-					//						DragController.setMoveNo(DragController.getMoveNo() + 1);
-					//						playBackForGhostMode(null) ;
-					//					}
-					//					else
-					//						trace("Answered Wrong") ;
+					
 					break ;
+					//				case 'q':
+					//					caseRead = 'q' ;
+					//					quesRead = RowData[1] ;
+					//					ansRead = RowData[2] ;
+					//
+					//					//					final String ansComp = ansRead ;
+					//					//
+					//					//					if(studentMode)
+					//					//					{
+					//					//						//						do
+					//					//						//						{
+					//					//
+					//					//						final EditText input = new EditText((Context) thisObj);
+					//					//						//						alert.setView(input);
+					//					//						final AlertDialog d = new AlertDialog.Builder((Context) thisObj)
+					//					//						.setView(input)
+					//					//						.setTitle(quesRead)
+					//					//						.setMessage(quesRead)
+					//					//						.setPositiveButton(android.R.string.ok, null) //Set to null. We override the onclick
+					//					//						//				        .setNegativeButton(android.R.string.cancel, null)
+					//					//						.create();
+					//					//
+					//					//						d.setOnShowListener(new DialogInterface.OnShowListener() {
+					//					//
+					//					//							@Override
+					//					//							public void onShow(DialogInterface dialog) {
+					//					//
+					//					//								Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
+					//					//								b.setOnClickListener(new View.OnClickListener() {
+					//					//
+					//					//									@Override
+					//					//									public void onClick(View view) {
+					//					//										//										d.dismiss(); 
+					//					//										Editable value = input.getText();
+					//					//										trace("Got text = " + value);
+					//					//										trace("ansComp = " + ansComp) ;
+					//					//										trace("Value equals ansComp = " + value.toString().equalsIgnoreCase(ansComp)) ;
+					//					//										if(value.toString().equalsIgnoreCase(ansComp))
+					//					//										{
+					//					//											DragController.setMoveNo(DragController.getMoveNo() + 1);
+					//					//											playBackForGhostMode(null) ;
+					//					//											d.dismiss(); 
+					//					//										}
+					//					//										else
+					//					//										{
+					//					//											toast("Wrong -- Enter again");
+					//					//										}
+					//					//
+					//					//
+					//					//										// TODO Do something
+					//					//
+					//					//										//Dismiss once everything is OK.
+					//					//										//				                d.dismiss();
+					//					//									}
+					//					//								});
+					//					//							}
+					//					//						});
+					//					//
+					//					//						d.show(); 
+					//					//					}
+					//					//					else
+					//					//					{
+					//					//						trace("Entered q else with ques " + quesRead + " ans " + ansRead) ;
+					//					//					}
+					//
+					//					//					if(answeredCorrect)
+					//					//					{
+					//					//						answeredCorrect = false ; 
+					//					//						DragController.setMoveNo(DragController.getMoveNo() + 1);
+					//					//						playBackForGhostMode(null) ;
+					//					//					}
+					//					//					else
+					//					//						trace("Answered Wrong") ;
+					//					break ;
 				}
 
 				//				line = reader.readLine() ;
@@ -1679,6 +1783,33 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		v.getLayoutParams().height = (int)value ;
 		v.getLayoutParams().width = (int)value ;
 		v.setLayoutParams(v.getLayoutParams());
+	}
+
+	public void scaleTextView(View v,float value) {
+
+		Rect bounds = new Rect();
+		Paint textPaint = ((TextView) v).getPaint();
+		textPaint.setTextAlign(Align.LEFT);
+		textPaint.setTextSize(((TextView)v).getTextSize());
+		textPaint.getTextBounds((String)(((TextView)v).getText()),0,(((TextView)v).getText().length()),bounds);
+		int height = bounds.height();
+		int width = bounds.width();
+
+		//		int charNo = ((TextView)v).getText().length() ;
+		//		((TextView)v).setHeight(height);
+		//		((TextView)v).setWidth(width);
+		//		v.getLayoutParams().height = height + 40 ;
+		//		v.getLayoutParams().width = width + 40;
+		//		v.setLayoutParams(v.getLayoutParams());
+		//		
+		//		TextView tv = (TextView) findViewById(v.getId());
+		//		tv.invalidate();
+		//		int height_in_pixels = tv.getLineCount() * tv.getLineHeight();
+		//		tv.setHeight(height_in_pixels);
+
+		v.setLayoutParams(new MyAbsoluteLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, (int)v.getX(), (int)v.getY())); 
+
+
 	}
 
 	public void playBack(View v)
@@ -1887,8 +2018,20 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			scale *= screenMetrics.heightPixels ;
 			if(objectSelectedForScaleRotate!=null && scale != 0)
 			{
+				if(objectSelectedForScaleRotate instanceof TextView)
+				{
+					if(progress > 5)
+					{
+						((TextView)objectSelectedForScaleRotate).setTextSize(progress);
+						//						((TextView)objectSelectedForScaleRotate).setGravity(Gravity.CENTER);
+						scaleTextView(objectSelectedForScaleRotate,progress) ;
+
+						//						((TextView)objectSelectedForScaleRotate).setGravity(Gravity.CENTER);
+					}
+				}
 				//				scaleRelative(objectSelectedForScaleRotate,scale);
-				scaleAbsolute(objectSelectedForScaleRotate,scale);
+				else
+					scaleAbsolute(objectSelectedForScaleRotate,scale);
 			}
 			//set textView's text
 			//            yourTextView.setText(""+progress);
@@ -2081,7 +2224,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		// Set up the input
 		final EditText input = new EditText(this);
-		// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 
 		builder.setView(input);
@@ -2091,45 +2233,52 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				m_Text = input.getText().toString();
-				TextView tv = new TextView((Context) thisObject);
-				trace(m_Text) ;
-				tv.setText(m_Text);
-
-				int w = 60;
-				int h = 60;
-				int left = 80;
-				int top = 100;
-				DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
-				mDragLayer.addView (tv, lp);
-				tv.setOnClickListener((OnClickListener) objectDef);
-				tv.setOnLongClickListener((OnLongClickListener) objectDef);
-				tv.setOnTouchListener((OnTouchListener) objectDef);
-				tv.setId(IDGen.generateViewId());
-
-				if(!studentMode)
+				if(!m_Text.isEmpty())
 				{
-					FileOutputStream fos = null;
-					try {
-						fos = openFileOutput("media", MODE_APPEND);
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					}
+					TextView tv = new TextView((Context) thisObject);
+					trace(m_Text) ;
+					tv.setText(m_Text);
 
-					try {
-						fos.write(("t" + "," + m_Text + "," + tv.getId()+ "\n").getBytes());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					//				int w = 60;
+					//				int h = 60;
+					//				int left = 80;
+					//				int top = 100;
+					//				DragLayer.LayoutParams lp = new DragLayer.LayoutParams (w, h, left, top);
+					mDragLayer.addView (tv);
+					tv.setOnClickListener((OnClickListener) objectDef);
+					tv.setOnLongClickListener((OnLongClickListener) objectDef);
+					tv.setOnTouchListener((OnTouchListener) objectDef);
+					tv.setId(IDGen.generateViewId());
 
-					try {
-						fos.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					MyAbsoluteLayout.LayoutParams lpMove = (MyAbsoluteLayout.LayoutParams) tv.getLayoutParams();
+					lpMove.x = (int)(0.3 * screenMetrics.widthPixels) ;
+					lpMove.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
+					tv.setLayoutParams(lpMove);
+
+					if(!studentMode)
+					{
+						FileOutputStream fos = null;
+						try {
+							fos = openFileOutput("media", MODE_APPEND);
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
+
+						try {
+							fos.write(("t" + "," + m_Text + "," + tv.getId()+ "\n").getBytes());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						try {
+							fos.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
-
 
 			}
 		});
@@ -2141,9 +2290,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		});
 
 		builder.show();
-
-
-
 	}
 
 	private void createLine(ImageView lineImage,float x, float y, float xEnd, float yEnd, int color) {
