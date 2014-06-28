@@ -151,22 +151,35 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	public TouchMode currentTouchMode  = TouchMode.MOVE ;
 
 	ListView list;
-	String[] equipmentItems = {
+	public static String[] equipmentItems = {
+			"Ammeter",
 			"Battery",
-			"Bulb",
 			"Resistor",
-			"Text",
-			"Line",
+			"Switch On",
+			"Switch Off",
+			"Voltmeter",
 	} ;
 	//			"Cancel"
 	//	} ;
-	Integer[] imageId = {
+	public static Integer[] imageId = {
+			R.drawable.exp_simulation_ammeter,
 			R.drawable.exp_simulation_battery,
-			R.drawable.exp_simulation_bulb,
 			R.drawable.exp_simulation_resistor,
-			R.drawable.exp_simulation_text_icon,
-			R.drawable.exp_simulation_line_icon,
+			R.drawable.exp_simulation_glossy_green_button,
+			R.drawable.exp_simulation_glossy_red_button,
+			R.drawable.exp_simulation_voltmeter,
 	};
+	
+	public static int[] imageIdInt = {
+		R.drawable.exp_simulation_ammeter,
+		R.drawable.exp_simulation_battery,
+		R.drawable.exp_simulation_resistor,
+		R.drawable.exp_simulation_glossy_green_button,
+		R.drawable.exp_simulation_glossy_red_button,
+		R.drawable.exp_simulation_voltmeter,
+};
+	
+	
 	//			R.drawable.cancel_icon
 	//	};
 
@@ -230,24 +243,25 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				Toast.makeText(DragActivityV2.this, "You Clicked at " +equipmentItems[+ which], Toast.LENGTH_SHORT).show();
 				final ImageView newView = new ImageView (getApplicationContext());
 				//				newView.setImageResource(R.drawable.beaker);
-
-				switch(which)
-				{
-				case 0:
-					newView.setImageResource(R.drawable.exp_simulation_battery);
-					break ;
-				case 1:
-					newView.setImageResource(R.drawable.exp_simulation_bulb);
-					break ;
-				case 2:
-					newView.setImageResource(R.drawable.exp_simulation_resistor);
-					break ;
-				case 3:
-					//Text Box insertion
-					break ;
-				default:
-					break ;	
-				}
+				
+				newView.setImageResource(imageId[which]) ;
+//				switch(which)
+//				{
+//				case 0:
+//					newView.setImageResource(R.drawable.exp_simulation_ammeter);
+//					break ;
+//				case 1:
+//					newView.setImageResource(R.drawable.exp_simulation_battery);
+//					break ;
+//				case 2:
+//					newView.setImageResource(R.drawable.exp_simulation_resistor);
+//					break ;
+//				case 3:
+//					//Text Box insertion
+//					break ;
+//				default:
+//					break ;	
+//				}
 
 				if(!studentMode)
 					newView.setId(IDGen.generateViewId());
@@ -1286,20 +1300,21 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					imageAdded = Integer.parseInt(RowData[1]) ;
 					imageId = Integer.parseInt(RowData[2]) ;
 					ImageView newView = new ImageView (this);
-					switch(imageAdded)
-					{
-					case 0:
-						newView.setImageResource(R.drawable.exp_simulation_battery);
-						break ;
-					case 1:
-						newView.setImageResource(R.drawable.exp_simulation_bulb);
-						break ;
-					case 2:
-						newView.setImageResource(R.drawable.exp_simulation_resistor);
-						break ;
-					default:
-						break ;	
-					}
+					newView.setImageResource(imageIdInt[imageAdded]) ;			
+//					switch(imageAdded)
+//					{
+//					case 0:
+//						newView.setImageResource(R.drawable.exp_simulation_battery);
+//						break ;
+//					case 1:
+//						newView.setImageResource(R.drawable.exp_simulation_bulb);
+//						break ;
+//					case 2:
+//						newView.setImageResource(R.drawable.exp_simulation_resistor);
+//						break ;
+//					default:
+//						break ;	
+//					}
 
 					newView.setId(imageId);
 					w = 60;
@@ -1323,20 +1338,21 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					if(studentMode && ghostMode)
 					{
 						ImageView newViewForUser = new ImageView (this);
-						switch(imageAdded)
-						{
-						case 0:
-							newViewForUser.setImageResource(R.drawable.exp_simulation_battery);
-							break ;
-						case 1:
-							newViewForUser.setImageResource(R.drawable.exp_simulation_bulb);
-							break ;
-						case 2:
-							newViewForUser.setImageResource(R.drawable.exp_simulation_resistor);
-							break ;
-						default:
-							break ;	
-						}
+						newViewForUser.setImageResource(imageIdInt[imageAdded]) ;
+//						switch(imageAdded)
+//						{
+//						case 0:
+//							newViewForUser.setImageResource(R.drawable.exp_simulation_battery);
+//							break ;
+//						case 1:
+//							newViewForUser.setImageResource(R.drawable.exp_simulation_bulb);
+//							break ;
+//						case 2:
+//							newViewForUser.setImageResource(R.drawable.exp_simulation_resistor);
+//							break ;
+//						default:
+//							break ;	
+//						}
 
 						newViewForUser.setId(imageId+100);
 						w = 60;
@@ -1575,38 +1591,39 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				case 'c':
 					imageId = Integer.parseInt(RowData[1]) ;
 					int imageNoChange = Integer.parseInt(RowData[2]) ;
-
-					switch(imageNoChange)
-					{
-					case 0:
-						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_battery);
-						break ;
-					case 1:
-						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_bulb);
-						break ;
-					case 2:
-						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_resistor);
-						break ;
-					default:
-						break ;	
-					}
+					((ImageView)findViewById(imageId)).setImageResource(imageIdInt[imageNoChange]) ;
+//					switch(imageNoChange)
+//					{
+//					case 0:
+//						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_battery);
+//						break ;
+//					case 1:
+//						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_bulb);
+//						break ;
+//					case 2:
+//						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_resistor);
+//						break ;
+//					default:
+//						break ;	
+//					}
 
 					if(studentMode && ghostMode)
 					{
-						switch(imageNoChange)
-						{
-						case 0:
-							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_battery);
-							break ;
-						case 1:
-							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_bulb);
-							break ;
-						case 2:
-							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_resistor);
-							break ;
-						default:
-							break ;	
-						}
+						((ImageView)findViewById(imageId+100)).setImageResource(imageIdInt[imageNoChange]) ;
+//						switch(imageNoChange)
+//						{
+//						case 0:
+//							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_battery);
+//							break ;
+//						case 1:
+//							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_bulb);
+//							break ;
+//						case 2:
+//							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_resistor);
+//							break ;
+//						default:
+//							break ;	
+//						}
 					}
 
 					caseRead = 'c' ;
