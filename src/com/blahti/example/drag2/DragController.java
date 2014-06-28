@@ -571,6 +571,11 @@ public class DragController {
 							finX *= mDisplayMetrics.widthPixels ;
 							finY *= mDisplayMetrics.heightPixels ;
 							
+							initX /= 100 ;
+							initY /= 100 ;
+							finX /= 100 ;
+							finY /= 100 ;
+							
 							Log.d ("DragController", "finX = " + finX + "xFInal = " + (xFinal-mTouchOffsetX));
 							Log.d ("DragController", "finY = " + finY + "yFInal = " + (yFinal-mTouchOffsetY));
 							Log.d("DragController","DIsplay" + (0.01*mDisplayMetrics.widthPixels)) ;
@@ -615,13 +620,16 @@ public class DragController {
 							{
 								movePer = ((DragActivityV2)mContext).playBackForGhostMode(null) ;
 								moveNo++ ;
+								((DragActivityV2)mContext).trace("movePer = " + movePer) ;
 								while(movePer == 'l' || movePer == 't')
 								{
 									movePer = ((DragActivityV2)mContext).playBackForGhostMode(null) ;
 									moveNo++ ;
 								}
 							}
-							while(movePer == 'd');
+							while(movePer == 'd'
+									|| movePer == 'a'
+									|| movePer == 'c');
 //							moveNo++ ;
 						}
 					}

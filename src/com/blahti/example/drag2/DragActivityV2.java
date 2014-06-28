@@ -11,15 +11,11 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.Buffer;
-
 import android.widget.SeekBar;
 
 import com.blahti.example.drag2.R;
-import com.blahti.example.drag2.R.color;
 import com.blahti.example.drag2.SeekArc.OnSeekArcChangeListener;
 
-import android.R.bool;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -101,9 +97,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	//	private static final int PLAY_ANIM = Menu.FIRST + 2 ;
 	//	private static final int RESET = Menu.FIRST + 3 ;
 	//	private static final int PLAY_STEP = Menu.FIRST + 1 ;
-	private static final int DELETE_FILE = Menu.FIRST + 1 ;
-	private static final int SHOW_BUTTONS = Menu.FIRST + 2 ;
-	private static final int ADMIN_MODE = Menu.FIRST + 3 ;
+//	private static final int DELETE_FILE = Menu.FIRST + 1 ;
+	private static final int SHOW_BUTTONS = Menu.FIRST + 1 ;
+//	private static final int ADMIN_MODE = Menu.FIRST + 3 ;
 	//	private static final int SCALE = Menu.FIRST + 6 ;
 
 	private String m_Text = "" ;
@@ -132,7 +128,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	public static final boolean Debugging = true;
 	View objectSelectedForScaleRotate = null ;
 	public static boolean ghostMode = false ;
-	public static boolean studentMode = false ;
+	public static boolean studentMode = true ;
 	public boolean firstTouchForLine = false ;
 	public int lineInitialX = 0 ;
 	public int lineInitialY = 0 ;
@@ -140,7 +136,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	public static boolean fileEndReached = false ;
 	View objectSelectedForDelete = null ;
 	public static boolean deleteMode = false ;
-//	private static boolean answeredCorrect = false;
+	//	private static boolean answeredCorrect = false;
 	//	public boolean lineMode = false ;
 
 	public enum TouchMode
@@ -442,7 +438,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 								trace("Rotate Read " + rotateRead) ;
 								trace("Rotation " + objectSelectedForScaleRotate.getRotation()) ;
 
-								if((objectSelectedForScaleRotate.getRotation() - rotateRead) > 10)
+								if(Math.abs(objectSelectedForScaleRotate.getRotation() - rotateRead) < 20)
 								{
 									objectSelectedForScaleRotate.setRotation(originalRotate);
 									return ;
@@ -519,9 +515,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//		menu.add(0, PLAY_ANIM, 0, "Play Animation") ;
 		//		menu.add(0, RESET, 0, "Reset") ;
 		//		menu.add(0,PLAY_STEP,0,"Step Mode") ;
-		menu.add(0,DELETE_FILE,0,"Delete File") ;
+//		menu.add(0,DELETE_FILE,0,"Delete File") ;
 		menu.add(0,SHOW_BUTTONS,0,"Show/Hide Buttons") ;
-		menu.add(0,ADMIN_MODE,0,"Admin Mode Toggle") ;
+//		menu.add(0,ADMIN_MODE,0,"Admin Mode Toggle") ;
 		//		menu.add(0,SCALE,0,"Scale and Rotate Mode") ;
 
 		return true;
@@ -737,7 +733,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//					try {
 		//						fos = openFileOutput("media", MODE_APPEND);
 		//					} catch (FileNotFoundException e) {
-		//						// TODO Auto-generated catch block
+		//						// 
 		//						e.printStackTrace();
 		//					}
 		//
@@ -831,14 +827,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//		case PLAY_STEP:
 		//			stepMode = !stepMode ;
 		//			return true ;
-		case DELETE_FILE:
-			File file = new File(getFilesDir().getAbsolutePath()+"/media") ;
-			//			toast((getFilesDir().getAbsolutePath()+"/media").toString()) ;
-			file.delete() ;
-			return true ;
-			//		case SCALE:
-			//			mLongClickStartsDrag = !mLongClickStartsDrag ;
-			//			return true ;
+//		case DELETE_FILE:
+//			File file = new File(getFilesDir().getAbsolutePath()+"/media") ;
+//			//			toast((getFilesDir().getAbsolutePath()+"/media").toString()) ;
+//			file.delete() ;
+//			return true ;
+//			//		case SCALE:
+//			//			mLongClickStartsDrag = !mLongClickStartsDrag ;
+//			//			return true ;
 		case SHOW_BUTTONS:
 			if(buttonsVisible)
 			{
@@ -861,15 +857,15 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				buttonsVisible = !buttonsVisible ;
 			}
 			return true ;
-		case ADMIN_MODE:
-			studentMode = !studentMode ;
-			if(studentMode)
-				setTitle("Virtual Labs - Student Mode");
-			else
-				setTitle("Virtual Labs - Teacher/Admin Mode");
-			if(Debugging)
-				trace("STUDENT MODE = " + studentMode) ;
-			break ;
+//		case ADMIN_MODE:
+//			studentMode = !studentMode ;
+//			if(studentMode)
+//				setTitle("Virtual Labs - Student Mode");
+//			else
+//				setTitle("Virtual Labs - Teacher/Admin Mode");
+//			if(Debugging)
+//				trace("STUDENT MODE = " + studentMode) ;
+//			break ;
 		}
 
 
@@ -1323,6 +1319,47 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					lpMove.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
 					newView.setLayoutParams(lpMove);
 
+					if(studentMode && ghostMode)
+					{
+						ImageView newViewForUser = new ImageView (this);
+						switch(imageAdded)
+						{
+						case 0:
+							newViewForUser.setImageResource(R.drawable.battery);
+							break ;
+						case 1:
+							newViewForUser.setImageResource(R.drawable.bulb);
+							break ;
+						case 2:
+							newViewForUser.setImageResource(R.drawable.resistor);
+							break ;
+						default:
+							break ;	
+						}
+
+						newViewForUser.setId(imageId+100);
+						w = 60;
+						h = 60;
+						left = 80;
+						top = 100;
+						lp = new DragLayer.LayoutParams (w, h, left, top);
+						mDragLayer.addView (newViewForUser, lp);
+						newViewForUser.setOnClickListener(this);
+						newViewForUser.setOnLongClickListener(this);
+						newViewForUser.setOnTouchListener(this);
+						//						if(ghostMode)
+						//							newView.setAlpha(30);
+						//						//					nextMove(reader) ;
+
+
+
+						MyAbsoluteLayout.LayoutParams lpMoveForUser = (MyAbsoluteLayout.LayoutParams) newViewForUser.getLayoutParams();
+						lpMoveForUser.x = (int)(0.3 * screenMetrics.widthPixels) ;
+						lpMoveForUser.y = (int) (0.4 * screenMetrics.heightPixels) - 40 ;
+						newView.setLayoutParams(lpMoveForUser);
+
+					}
+
 					caseRead = 'a' ;
 					break ;
 
@@ -1338,6 +1375,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					initY *= screenMetrics.heightPixels ;
 					finX *= screenMetrics.widthPixels ;
 					finY *= screenMetrics.heightPixels ;
+
+					initX /= 100 ;
+					initY /= 100 ;
+					finX /= 100 ;
+					finY /= 100 ;
 
 					//					trace("initX = " + initX) ;
 					//					trace("heightPixels = " + screenMetrics.heightPixels) ;
@@ -1358,6 +1400,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 					imageId = Integer.parseInt(RowData[1]) ;
 					scale = Float.parseFloat(RowData[2]) ;
+					scale /= 100 ;
+					scale *= screenMetrics.heightPixels ;
 
 					//					float scaleDec = scale / 100 ;
 					//					//				trace("scaleDec" + scaleDec) ;
@@ -1509,6 +1553,16 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					finX = Float.parseFloat(RowData[3]) ;
 					finY = Float.parseFloat(RowData[4]);
 
+					initX *= screenMetrics.widthPixels ;
+					initY *= screenMetrics.heightPixels ;
+					finX *= screenMetrics.widthPixels ;
+					finY *= screenMetrics.heightPixels ;
+
+					initX /= 100 ;
+					initY /= 100 ;
+					finX /= 100 ;
+					finY /= 100 ;
+
 					createLine((ImageView)findViewById(R.id.blankBackground), initX, initY, finX, finY, Color.GREEN);
 					caseRead = 'l' ;
 					break ;
@@ -1519,8 +1573,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					break ;
 				case 'c':
 					imageId = Integer.parseInt(RowData[1]) ;
-					int imageNoChange = Integer.parseInt(RowData[3]) ;
-					
+					int imageNoChange = Integer.parseInt(RowData[2]) ;
+
 					switch(imageNoChange)
 					{
 					case 0:
@@ -1535,7 +1589,26 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					default:
 						break ;	
 					}
-					
+
+					if(studentMode && ghostMode)
+					{
+						switch(imageNoChange)
+						{
+						case 0:
+							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.battery);
+							break ;
+						case 1:
+							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.bulb);
+							break ;
+						case 2:
+							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.resistor);
+							break ;
+						default:
+							break ;	
+						}
+					}
+
+					caseRead = 'c' ;
 					break ;
 					//				case 'q':
 					//					caseRead = 'q' ;
@@ -1847,6 +1920,15 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			}
 			else
 			{
+				if(ghostMode)
+				{
+					do
+					{
+						movePerformed = nextMove(reader) ;
+					}while(movePerformed=='a'
+							||movePerformed=='c') ;
+					
+				}
 				nextMove(reader) ;
 			}
 		}
@@ -2023,9 +2105,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					if(progress > 5)
 					{
 						((TextView)objectSelectedForScaleRotate).setTextSize(progress);
+						((TextView)objectSelectedForScaleRotate).setTop(0);
+						((TextView)objectSelectedForScaleRotate).setLeft(0);
 						//						((TextView)objectSelectedForScaleRotate).setGravity(Gravity.CENTER);
 						scaleTextView(objectSelectedForScaleRotate,progress) ;
-
+						((TextView)objectSelectedForScaleRotate).setLeft(0);
+						((TextView)objectSelectedForScaleRotate).setTop(0);
 						//						((TextView)objectSelectedForScaleRotate).setGravity(Gravity.CENTER);
 					}
 				}
@@ -2061,7 +2146,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					}
 
 					try {
-						fos.write(("s" + "," + objectSelectedForScaleRotate.getId() + "," + scale + "\n").getBytes());
+						fos.write(("s" + "," + objectSelectedForScaleRotate.getId() + "," + (scale/screenMetrics.heightPixels)*100 + "\n").getBytes());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -2117,11 +2202,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 							imageId = Integer.parseInt(RowData[1]);
 							scaleRead = Float.parseFloat(RowData[2]) ; 
+							
+							scaleRead /= 100 ;
+							scaleRead *= screenMetrics.heightPixels ;
 
 							trace("scale Read " + scaleRead) ;
 							trace("height " + objectSelectedForScaleRotate.getLayoutParams().height) ;
 
-							if((objectSelectedForScaleRotate.getLayoutParams().height - scaleRead) > (0.01)*screenMetrics.heightPixels)
+							if(Math.abs(objectSelectedForScaleRotate.getLayoutParams().height - scaleRead) < (0.1)*screenMetrics.heightPixels)
 							{
 								scaleAbsolute(objectSelectedForScaleRotate,originalScale);
 								return ;
@@ -2210,9 +2298,15 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		boolean on = ((ToggleButton) v).isChecked();
 
 		if(on)
+		{
 			ghostMode = true;
+			stepMode = true ;
+		}
 		else
+		{
 			ghostMode = false ;
+			stepMode = false ;
+		}
 	}
 
 	public void insertTextBox(final Object objectDef)
@@ -2397,7 +2491,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				objectSelectedForScaleRotate = null ;
 				currentTouchMode = TouchMode.MOVE ;
 				ghostMode = false ;
-				studentMode = false ;
+				studentMode = true ;
 				DragController.setMoveNo(0);
 				fileEndReached = false ;
 				deleteMode = false ;
