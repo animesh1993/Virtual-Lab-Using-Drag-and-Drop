@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Touch and hold to drag a view</string>
+    <string name="app_name">Virtual Experiments</string>
+    <string name="InfoData">Raw Data</string>
+</resources>
