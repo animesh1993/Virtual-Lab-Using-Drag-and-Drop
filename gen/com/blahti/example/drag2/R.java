@@ -170,44 +170,44 @@ containing a value of this type.
         public static final int title_texture_width=0x7f050000;
     }
     public static final class drawable {
-        public static final int add_button_icon=0x7f020000;
-        public static final int battery=0x7f020001;
-        public static final int beaker=0x7f020002;
-        public static final int black_back=0x7f020003;
-        public static final int blank_white_shape=0x7f020004;
-        public static final int bulb=0x7f020005;
-        public static final int burrete=0x7f020006;
-        public static final int cancel_icon=0x7f020007;
-        public static final int chemicon=0x7f020008;
-        public static final int delete_confirmation=0x7f020009;
-        public static final int flaskicon=0x7f02000a;
-        public static final int ghost_button=0x7f02000b;
-        public static final int hello=0x7f02000c;
-        public static final int ic_launcher=0x7f02000d;
-        public static final int icon=0x7f02000e;
-        public static final int line_icon=0x7f02000f;
-        public static final int minus_icon=0x7f020010;
-        public static final int minus_sign=0x7f020011;
-        public static final int onepx=0x7f020012;
-        public static final int photo1=0x7f020013;
-        public static final int photo2=0x7f020014;
-        public static final int play_button=0x7f020015;
-        public static final int plus_icon=0x7f020016;
-        public static final int plus_sign=0x7f020017;
-        public static final int reset_button=0x7f020018;
-        public static final int resistor=0x7f020019;
-        public static final int scrubber_control_disabled_holo=0x7f02001a;
-        public static final int scrubber_control_focused_holo=0x7f02001b;
-        public static final int scrubber_control_normal_holo=0x7f02001c;
-        public static final int scrubber_control_pressed_holo=0x7f02001d;
-        public static final int seek_arc_control_selector=0x7f02001e;
-        public static final int test_bg1=0x7f02001f;
-        public static final int test_bg2=0x7f020020;
-        public static final int testtube=0x7f020021;
-        public static final int text_icon=0x7f020022;
-        public static final int transparent=0x7f020023;
-        public static final int transparent_background=0x7f020024;
-        public static final int transparent_without_border=0x7f020025;
+        public static final int exp_simulation_add_button_icon=0x7f020000;
+        public static final int exp_simulation_battery=0x7f020001;
+        public static final int exp_simulation_beaker=0x7f020002;
+        public static final int exp_simulation_black_back=0x7f020003;
+        public static final int exp_simulation_blank_white_shape=0x7f020004;
+        public static final int exp_simulation_bulb=0x7f020005;
+        public static final int exp_simulation_burrete=0x7f020006;
+        public static final int exp_simulation_cancel_icon=0x7f020007;
+        public static final int exp_simulation_chemicon=0x7f020008;
+        public static final int exp_simulation_delete_confirmation=0x7f020009;
+        public static final int exp_simulation_flaskicon=0x7f02000a;
+        public static final int exp_simulation_ghost_button=0x7f02000b;
+        public static final int exp_simulation_hello=0x7f02000c;
+        public static final int exp_simulation_ic_launcher=0x7f02000d;
+        public static final int exp_simulation_icon=0x7f02000e;
+        public static final int exp_simulation_line_icon=0x7f02000f;
+        public static final int exp_simulation_minus_icon=0x7f020010;
+        public static final int exp_simulation_minus_sign=0x7f020011;
+        public static final int exp_simulation_onepx=0x7f020012;
+        public static final int exp_simulation_photo1=0x7f020013;
+        public static final int exp_simulation_photo2=0x7f020014;
+        public static final int exp_simulation_play_button=0x7f020015;
+        public static final int exp_simulation_plus_icon=0x7f020016;
+        public static final int exp_simulation_plus_sign=0x7f020017;
+        public static final int exp_simulation_reset_button=0x7f020018;
+        public static final int exp_simulation_resistor=0x7f020019;
+        public static final int exp_simulation_scrubber_control_disabled_holo=0x7f02001a;
+        public static final int exp_simulation_scrubber_control_focused_holo=0x7f02001b;
+        public static final int exp_simulation_scrubber_control_normal_holo=0x7f02001c;
+        public static final int exp_simulation_scrubber_control_pressed_holo=0x7f02001d;
+        public static final int exp_simulation_seek_arc_control_selector=0x7f02001e;
+        public static final int exp_simulation_test_bg1=0x7f02001f;
+        public static final int exp_simulation_test_bg2=0x7f020020;
+        public static final int exp_simulation_testtube=0x7f020021;
+        public static final int exp_simulation_text_icon=0x7f020022;
+        public static final int exp_simulation_transparent=0x7f020023;
+        public static final int exp_simulation_transparent_background=0x7f020024;
+        public static final int exp_simulation_transparent_without_border=0x7f020025;
     }
     public static final class id {
         public static final int Image1=0x7f080016;
@@ -236,9 +236,9 @@ containing a value of this type.
         public static final int verticalSeekBarContainer=0x7f080008;
     }
     public static final class layout {
-        public static final int list_single=0x7f030000;
-        public static final int main=0x7f030001;
-        public static final int main_v1=0x7f030002;
+        public static final int exp_simulation_list_single=0x7f030000;
+        public static final int exp_simulation_main=0x7f030001;
+        public static final int exp_simulation_main_v1=0x7f030002;
     }
     public static final class string {
         public static final int InfoData=0x7f060002;
