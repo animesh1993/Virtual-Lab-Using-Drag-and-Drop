@@ -142,14 +142,14 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/play_button" />
 
-            <ImageButton
-                android:id="@+id/addButton"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:onClick="addObject"
-                android:scaleType="centerInside"
-                android:src="@drawable/add_button_icon" />
+<!--             <ImageButton -->
+<!--                 android:id="@+id/addButton" -->
+<!--                 style="?android:attr/buttonStyleSmall" -->
+<!--                 android:layout_width="match_parent" -->
+<!--                 android:layout_height="50dp" -->
+<!--                 android:onClick="addObject" -->
+<!--                 android:scaleType="centerInside" -->
+<!--                 android:src="@drawable/add_button_icon" /> -->
 
             <ImageButton
                 android:id="@+id/resetButton"

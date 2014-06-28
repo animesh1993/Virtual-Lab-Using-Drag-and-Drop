@@ -838,7 +838,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		case SHOW_BUTTONS:
 			if(buttonsVisible)
 			{
-				findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
+//				findViewById(R.id.addButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.modeRadioGroup).setVisibility(View.INVISIBLE);
 				//				findViewById(R.id.playButton).setVisibility(View.INVISIBLE);
 				findViewById(R.id.resetButton).setVisibility(View.INVISIBLE);
@@ -848,7 +848,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			}
 			else
 			{
-				findViewById(R.id.addButton).setVisibility(View.VISIBLE);
+//				findViewById(R.id.addButton).setVisibility(View.VISIBLE);
 				findViewById(R.id.modeRadioGroup).setVisibility(View.VISIBLE);
 				//				findViewById(R.id.playButton).setVisibility(View.VISIBLE);
 				findViewById(R.id.resetButton).setVisibility(View.VISIBLE);
