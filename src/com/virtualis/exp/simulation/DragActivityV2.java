@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
+import android.webkit.WebView.FindListener;
 import android.widget.SeekBar;
 
 import com.blahti.example.drag2.R;
@@ -125,7 +127,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	String targetUrl = "http://goo.gl/qfGTN3";
 	private static boolean buttonsVisible = false ;
 
-	public static final boolean Debugging = true;
+	public static final boolean Debugging = false;
 	View objectSelectedForScaleRotate = null ;
 	public static boolean ghostMode = false ;
 	public static boolean studentMode = true ;
@@ -338,7 +340,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
 		findViewById(R.id.plusSignImage).setVisibility(View.INVISIBLE);
 		findViewById(R.id.minusSignImage).setVisibility(View.INVISIBLE);
+		findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE) ;
 		findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
+		findViewById(R.id.modeRadioGroup).setVisibility(View.INVISIBLE); 
 		buttonsVisible = true ;
 		stepMode = false ;
 		mLongClickStartsDrag = false ;
@@ -511,6 +515,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		reader = new BufferedReader(new InputStreamReader(fis));
 		findViewById(R.id.seekArc).setRotation(0);
 		findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
+//		reset(null) ;
 		//		DragController.resetReader(); 
 
 	}
@@ -1092,6 +1097,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 			// In the situation where a long click is not needed to initiate a drag, simply start on the down event.
 			if (action == MotionEvent.ACTION_DOWN && (v.getId() != R.id.blankBackground)) {
+				trace("Entered StartDrag" ) ;
 				handledHere = startDrag (v);
 				objectSelectedForScaleRotate = v ;
 			}
@@ -1253,6 +1259,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					do
 					{
 						movePer = nextMove(reader) ;
+						DragController.setMoveNo(DragController.getMoveNo()+1) ;
 					}while(movePer!='m') ;
 				}
 
@@ -1355,12 +1362,13 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 //						}
 
 						newViewForUser.setId(imageId+100);
+						trace("NewViewForUser id = " + newViewForUser.getId()) ;
 						w = 60;
 						h = 60;
 						left = 80;
 						top = 100;
-						lp = new DragLayer.LayoutParams (w, h, left, top);
-						mDragLayer.addView (newViewForUser, lp);
+						DragLayer.LayoutParams lpForUser = new DragLayer.LayoutParams (w, h, left, top);
+						mDragLayer.addView (newViewForUser, lpForUser);
 						newViewForUser.setOnClickListener(this);
 						newViewForUser.setOnLongClickListener(this);
 						newViewForUser.setOnTouchListener(this);
@@ -1373,7 +1381,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						MyAbsoluteLayout.LayoutParams lpMoveForUser = (MyAbsoluteLayout.LayoutParams) newViewForUser.getLayoutParams();
 						lpMoveForUser.x = (int)(0.3 * screenMetrics.widthPixels) ;
 						lpMoveForUser.y = (int) (0.4 * screenMetrics.heightPixels) - yOffSet ;
-						newView.setLayoutParams(lpMoveForUser);
+						newViewForUser.setLayoutParams(lpMoveForUser);
 
 					}
 
@@ -1938,18 +1946,19 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			}
 			else
 			{
-				if(ghostMode)
+				if(ghostMode && studentMode)
 				{
 					do
 					{
 						movePerformed = nextMove(reader) ;
+						DragController.setMoveNo(DragController.getMoveNo()+1) ;
 					}while(movePerformed=='a'
 							||movePerformed=='c'
 							||movePerformed=='t'
 							||movePerformed=='q') ;
 					
 				}
-				nextMove(reader) ;
+//				nextMove(reader) ;
 			}
 		}
 	}
@@ -2313,7 +2322,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	}
 
-	public static void ghostModeToggle(View v)
+	public void ghostModeToggle(View v)
 	{
 		boolean on = ((ToggleButton) v).isChecked();
 
@@ -2321,11 +2330,16 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		{
 			ghostMode = true;
 			stepMode = true ;
+			findViewById(R.id.modeRadioGroup).setVisibility(View.VISIBLE) ;
+			findViewById(R.id.stepModeToggle).setVisibility(View.INVISIBLE) ;
+			
 		}
 		else
 		{
 			ghostMode = false ;
 			stepMode = false ;
+			findViewById(R.id.modeRadioGroup).setVisibility(View.INVISIBLE) ;
+			findViewById(R.id.stepModeToggle).setVisibility(View.VISIBLE) ;
 		}
 	}
 
@@ -2554,4 +2568,5 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		return myQuittingDialogBox;
 
 	}
+
 } // end class

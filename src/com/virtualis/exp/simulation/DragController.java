@@ -187,6 +187,8 @@ public class DragController {
 	 */
 	public void startDrag(View v, DragSource source, Object dragInfo, int dragAction) {
 		// Start dragging, but only if the source has something to drag.
+		Log.d ("DragController","REached inside startDrag") ;
+		
 		boolean doDrag = source.allowDrag ();
 		if (!doDrag) return;
 
@@ -494,6 +496,7 @@ public class DragController {
 				//                }
 				if(!DragActivityV2.studentMode)
 				{
+					Log.d ("DragController","wrong");
 					FileOutputStream fos = null;
 					try {
 						fos = mContext.openFileOutput("media", Context.MODE_APPEND);
@@ -524,6 +527,7 @@ public class DragController {
 				}
 				else
 				{
+					Log.d ("DragController","Correct") ;
 					int imageId ;
 					float initX, finX, initY, finY ;
 					String[] RowData = null;
@@ -553,6 +557,8 @@ public class DragController {
 						{
 
 							RowData = line.split(",");
+							Log.d ("DragController","Entered DragController" + RowData[0]) ;
+							Log.d ("DragController","Move" + moveNo ); 
 							if(RowData[0].charAt(0) != 'm')
 							{
 								if(RowData[0].charAt(0) == 'a')

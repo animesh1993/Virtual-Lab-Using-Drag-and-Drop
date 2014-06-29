@@ -102,17 +102,6 @@
             seekarc:touchInside="true" />
 
         <ToggleButton
-            android:id="@+id/stepModeToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/modeRadioGroup"
-            android:layout_alignParentRight="true"
-            android:onClick="stepModeToggle"
-            android:text="StepModeToggle"
-            android:textOff="Cont Mode"
-            android:textOn="Step Mode" />
-
-        <ToggleButton
             android:id="@+id/ghostModeToggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -126,7 +115,7 @@
             android:id="@+id/buttonContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/ghostModeToggle"
+            android:layout_above="@+id/stepModeToggle"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/ghostModeToggle"
@@ -188,13 +177,25 @@
             android:id="@+id/rotateValueText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/seekArc"
+            android:layout_above="@+id/modeRadioGroup"
             android:layout_alignLeft="@+id/seekArc"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/seekArc"
             android:gravity="center"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ToggleButton
+            android:id="@+id/stepModeToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/ghostModeToggle"
+            android:layout_alignParentLeft="true"
+            android:onClick="stepModeToggle"
+            android:text="StepModeToggle"
+            android:textOff="Cont Mode"
+            android:textOn="Step Mode" />
+
     </RelativeLayout>
 
 </com.virtualis.exp.simulation.DragLayer>
