@@ -41,6 +41,7 @@ import android.media.Image;
 import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
@@ -127,7 +128,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	String targetUrl = "http://goo.gl/qfGTN3";
 	private static boolean buttonsVisible = false ;
 
-	public static final boolean Debugging = false;
+	public static final boolean Debugging = true;
 	View objectSelectedForScaleRotate = null ;
 	public static boolean ghostMode = false ;
 	public static boolean studentMode = true ;
@@ -2654,4 +2655,23 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 	}
 
-} // end class
+	private boolean doubleBackToExitPressedOnce = false;
+	
+	@Override
+	public void onBackPressed() {
+	    if (doubleBackToExitPressedOnce) {
+	        super.onBackPressed();
+	        return;
+	    }
+
+	    this.doubleBackToExitPressedOnce = true;
+	    Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+	    new Handler().postDelayed(new Runnable() {
+
+	        @Override
+	        public void run() {
+	            doubleBackToExitPressedOnce=false;                       
+	        }
+	    }, 2000);
+	} } // end class
