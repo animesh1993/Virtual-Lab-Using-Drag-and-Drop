@@ -636,7 +636,8 @@ public class DragController {
 							}
 							while(movePer == 'd'
 									|| movePer == 'a'
-									|| movePer == 'c');
+									|| movePer == 'c'
+									|| movePer == 'l');
 //							moveNo++ ;
 						}
 					}
