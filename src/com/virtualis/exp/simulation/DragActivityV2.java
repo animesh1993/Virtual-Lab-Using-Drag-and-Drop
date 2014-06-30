@@ -457,14 +457,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 								trace("Rotate Read " + rotateRead) ;
 								trace("Rotation " + objectSelectedForScaleRotate.getRotation()) ;
 								
-								float rotationDiff = Math.abs(objectSelectedForScaleRotate.getRotation() - rotateRead) ;
-								if(rotationDiff > 180)
-									rotationDiff -= 180 ;
-								if(rotationDiff < 20)
-								{
-									objectSelectedForScaleRotate.setRotation(originalRotate);
-									return ;
-								}
+//								float rotationDiff = Math.abs(objectSelectedForScaleRotate.getRotation() - rotateRead) ;
+//								if(rotationDiff > 180)
+//									rotationDiff -= 180 ;
+//								if(rotationDiff < 20)
+//								{
+//									objectSelectedForScaleRotate.setRotation(originalRotate);
+//									return ;
+//								}
 
 								objectSelectedForScaleRotate.setRotation(rotateRead);
 								DragController.setMoveNo(DragController.getMoveNo()+1);
@@ -520,6 +520,38 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
 //		reset(null) ;
 		//		DragController.resetReader(); 
+		
+		lineNo = 1 ;
+		mLongClickStartsDrag = false ;
+		stepMode = false ;
+		objectSelectedForScaleRotate = null ;
+		currentTouchMode = TouchMode.MOVE ;
+		ghostMode = false ;
+		studentMode = true ;
+		DragController.setMoveNo(0);
+		fileEndReached = false ;
+		deleteMode = false ;
+		objectSelectedForDelete = null ;
+		//				DragController.resetReader();
+
+		if(studentMode)
+			setTitle("Virtual Labs - Student Mode");
+		else
+			setTitle("Virtual Labs - Teacher/Admin Mode");
+
+		fis = null ;
+
+		try {
+			fis = openFileInput("media") ;
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			//			e1.printStackTrace();
+			toast("Error: File Not Found") ;
+			trace("File Error");
+			return ;
+		}
+
+		reader = new BufferedReader(new InputStreamReader(fis));
 
 	}
 	/**
@@ -1225,7 +1257,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	{
 		if (!Debugging) return;
 		Log.d ("DragActivity", msg);
-		toast (msg);
+//		toast (msg);
 	}
 
 	public void anim(int imageId,float xInitial, float yInitial, final float xFinal, final float yFinal){
@@ -2241,11 +2273,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 							trace("scale Read " + scaleRead) ;
 							trace("height " + objectSelectedForScaleRotate.getLayoutParams().height) ;
 
-							if(Math.abs(objectSelectedForScaleRotate.getLayoutParams().height - scaleRead) < (0.1)*screenMetrics.heightPixels)
-							{
-								scaleAbsolute(objectSelectedForScaleRotate,originalScale);
-								return ;
-							}
+//							if(Math.abs(objectSelectedForScaleRotate.getLayoutParams().height - scaleRead) < (0.1)*screenMetrics.heightPixels)
+//							{
+//								scaleAbsolute(objectSelectedForScaleRotate,originalScale);
+//								return ;
+//							}
 
 							scaleAbsolute(objectSelectedForScaleRotate,scaleRead);
 							DragController.setMoveNo(DragController.getMoveNo()+1);
