@@ -139,6 +139,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	View objectSelectedForDelete = null ;
 	public static boolean deleteMode = false ;
 	private static int yOffSet = 40 ;
+	public String fileName = "media" ;
 	//	private static boolean answeredCorrect = false;
 	//	public boolean lineMode = false ;
 
@@ -272,7 +273,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				{
 					FileOutputStream fos = null;
 					try {
-						fos = openFileOutput("media", MODE_APPEND);
+						fos = openFileOutput(fileName, MODE_APPEND);
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -392,7 +393,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						trace("Entered non student mode of rotate") ;
 						FileOutputStream fos = null;
 						try {
-							fos = openFileOutput("media", MODE_APPEND);
+							fos = openFileOutput(fileName, MODE_APPEND);
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						}
@@ -421,7 +422,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						FileInputStream fis = null ;
 
 						try {
-							fis = openFileInput("media") ;
+							fis = openFileInput(fileName) ;
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 							return ;
@@ -506,7 +507,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		FileInputStream fis = null ;
 
 		try {
-			fis = openFileInput("media") ;
+			fis = openFileInput(fileName) ;
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			//			e1.printStackTrace();
@@ -542,7 +543,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		fis = null ;
 
 		try {
-			fis = openFileInput("media") ;
+			fis = openFileInput(fileName) ;
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			//			e1.printStackTrace();
@@ -640,7 +641,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//
 		//					FileOutputStream fos = null;
 		//					try {
-		//						fos = openFileOutput("media", MODE_APPEND);
+		//						fos = openFileOutput(fileName, MODE_APPEND);
 		//					} catch (FileNotFoundException e) {
 		//						// TODO Auto-generated catch block
 		//						e.printStackTrace();
@@ -702,7 +703,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//
 		//					FileOutputStream fos = null;
 		//					try {
-		//						fos = openFileOutput("media", MODE_APPEND);
+		//						fos = openFileOutput(fileName, MODE_APPEND);
 		//					} catch (FileNotFoundException e) {
 		//						// TODO Auto-generated catch block
 		//						e.printStackTrace();
@@ -786,7 +787,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//					// the user clicked on equipment[which]
 		//					FileOutputStream fos = null;
 		//					try {
-		//						fos = openFileOutput("media", MODE_APPEND);
+		//						fos = openFileOutput(fileName, MODE_APPEND);
 		//					} catch (FileNotFoundException e) {
 		//						// 
 		//						e.printStackTrace();
@@ -863,7 +864,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//			FileInputStream fis = null ;
 		//
 		//			try {
-		//				fis = openFileInput("media") ;
+		//				fis = openFileInput(fileName) ;
 		//			} catch (FileNotFoundException e1) {
 		//				// TODO Auto-generated catch block
 		//				e1.printStackTrace();
@@ -975,7 +976,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				{
 					FileOutputStream fos = null;
 					try {
-						fos = openFileOutput("media", MODE_APPEND);
+						fos = openFileOutput(fileName, MODE_APPEND);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					}
@@ -1035,7 +1036,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 								FileOutputStream fos = null;
 								try {
-									fos = openFileOutput("media", MODE_APPEND);
+									fos = openFileOutput(fileName, MODE_APPEND);
 								} catch (FileNotFoundException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -1097,7 +1098,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 								FileOutputStream fos = null;
 								try {
-									fos = openFileOutput("media", MODE_APPEND);
+									fos = openFileOutput(fileName, MODE_APPEND);
 								} catch (FileNotFoundException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -1958,7 +1959,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//			FileInputStream fis = null ;
 			//
 			//			try {
-			//				fis = openFileInput("media") ;
+			//				fis = openFileInput(fileName) ;
 			//			} catch (FileNotFoundException e1) {
 			//				// TODO Auto-generated catch block
 			//				//			e1.printStackTrace();
@@ -2010,7 +2011,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 			//			FileInputStream fis = null ;
 			//
 			//			try {
-			//				fis = openFileInput("media") ;
+			//				fis = openFileInput(fileName) ;
 			//			} catch (FileNotFoundException e1) {
 			//				// 
 			//				//			e1.printStackTrace();
@@ -2053,7 +2054,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		//		FileInputStream fis = null ;
 		//
 		//		try {
-		//			fis = openFileInput("media") ;
+		//			fis = openFileInput(fileName) ;
 		//		} catch (FileNotFoundException e1) {
 		//			// TODO Auto-generated catch block
 		//			//			e1.printStackTrace();
@@ -2203,7 +2204,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				{
 					FileOutputStream fos = null;
 					try {
-						fos = openFileOutput("media", MODE_APPEND);
+						fos = openFileOutput(fileName, MODE_APPEND);
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -2234,7 +2235,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					FileInputStream fis = null ;
 
 					try {
-						fis = openFileInput("media") ;
+						fis = openFileInput(fileName) ;
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -2333,7 +2334,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				{
 					FileOutputStream fos = null;
 					try {
-						fos = openFileOutput("media", MODE_APPEND);
+						fos = openFileOutput(fileName, MODE_APPEND);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					}
@@ -2422,7 +2423,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					{
 						FileOutputStream fos = null;
 						try {
-							fos = openFileOutput("media", MODE_APPEND);
+							fos = openFileOutput(fileName, MODE_APPEND);
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						}
@@ -2505,7 +2506,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				{
 					FileOutputStream fos = null;
 					try {
-						fos = openFileOutput("media", MODE_APPEND);
+						fos = openFileOutput(fileName, MODE_APPEND);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					}
@@ -2575,7 +2576,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				FileInputStream fis = null ;
 
 				try {
-					fis = openFileInput("media") ;
+					fis = openFileInput(fileName) ;
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					//			e1.printStackTrace();

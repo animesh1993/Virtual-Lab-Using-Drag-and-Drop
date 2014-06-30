@@ -67,6 +67,7 @@ public class DragController {
 //	}
 
 	private static int moveNo = 1 ;
+	public String fileName = "media" ;
 
 	public static int getMoveNo() {
 		return moveNo;
@@ -499,7 +500,7 @@ public class DragController {
 					Log.d ("DragController","wrong");
 					FileOutputStream fos = null;
 					try {
-						fos = mContext.openFileOutput("media", Context.MODE_APPEND);
+						fos = mContext.openFileOutput(fileName, Context.MODE_APPEND);
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -536,7 +537,7 @@ public class DragController {
 					FileInputStream fis = null ;
 
 					try {
-						fis = mContext.openFileInput("media") ;
+						fis = mContext.openFileInput(fileName) ;
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
 						//			e1.printStackTrace();
