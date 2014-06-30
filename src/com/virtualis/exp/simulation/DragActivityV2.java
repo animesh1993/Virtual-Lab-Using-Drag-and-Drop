@@ -456,8 +456,11 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 								trace("Rotate Read " + rotateRead) ;
 								trace("Rotation " + objectSelectedForScaleRotate.getRotation()) ;
-
-								if(Math.abs(objectSelectedForScaleRotate.getRotation() - rotateRead) < 20)
+								
+								float rotationDiff = Math.abs(objectSelectedForScaleRotate.getRotation() - rotateRead) ;
+								if(rotationDiff > 180)
+									rotationDiff -= 180 ;
+								if(rotationDiff < 20)
 								{
 									objectSelectedForScaleRotate.setRotation(originalRotate);
 									return ;
