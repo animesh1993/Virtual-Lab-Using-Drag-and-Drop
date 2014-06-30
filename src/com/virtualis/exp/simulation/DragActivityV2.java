@@ -1,7 +1,6 @@
 package com.virtualis.exp.simulation;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,7 +11,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import android.webkit.WebView.FindListener;
 import android.widget.SeekBar;
 
 import com.blahti.example.drag2.R;
@@ -35,19 +33,13 @@ import android.graphics.Paint.Align;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.hardware.display.DisplayManager;
-import android.inputmethodservice.Keyboard.Row;
-import android.media.Image;
-import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -62,24 +54,18 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout.LayoutParams;
-import android.widget.ImageView.ScaleType;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.util.*;
 /**
  * This activity presents a screen on which images can be added and moved around.
  * It also defines areas on the screen where the dragged views can be dropped. Feedback is
  * provided to the user as the objects are dragged over these drop zones.
  *
- * <p> Like the DragActivity in the previous version of the DragView example application, the
- * code here is derived from the Android Launcher code.
+ * The code here is derived from the Android Launcher code.
  * 
  */
 
@@ -128,7 +114,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	String targetUrl = "http://goo.gl/qfGTN3";
 	private static boolean buttonsVisible = false ;
 
-	public static final boolean Debugging = true;
+	public static final boolean Debugging = false;
 	View objectSelectedForScaleRotate = null ;
 	public static boolean ghostMode = false ;
 	public static boolean studentMode = true ;
@@ -1014,123 +1000,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		{
 
 			trace("Entered onTouch with if") ;
-
 			objectSelectedForScaleRotate = v ;
 			Log.d("DEBUG", "ObjectSelected "+objectSelectedForScaleRotate.getId());
-
-
-			/*
-						AlertDialog.Builder alert = new AlertDialog.Builder(this);
-						alert.setTitle("Scaling");
-						alert.setMessage("Enter Scaling or Rotation Value (integer)");
-
-						// Set an EditText view to get user input 
-						final EditText input = new EditText(this);
-						input.setInputType(InputType.TYPE_CLASS_NUMBER);
-						alert.setView(input);
-						alert.setPositiveButton("Scale", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								String value = input.getText().toString();
-								// Do something with value!
-								if(value.length() == 0)
-								{
-									toast("No text entered Error") ;
-									return ;
-								}
-
-								Float scale = Float.parseFloat(value) ;
-								//			  scale = scale/100 ;
-								trace("Scale =  " + scale);
-								scaleRelative(v,scale);
-
-								FileOutputStream fos = null;
-								try {
-									fos = openFileOutput(fileName, MODE_APPEND);
-								} catch (FileNotFoundException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-
-								try {
-									fos.write(("s" + "," + v.getId() + "," + scale + "\n").getBytes());
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-
-								try {
-									fos.close();
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-
-								//			  	scaleImageAbsolute((ImageView)v,Integer.parseInt(value));
-								//					scaleImageRelative((ImageView)v, scale);
-							}
-						});
-
-						alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								// Canceled.
-								//				  scaleImageAbsolute((ImageView)v, 300);
-								//					scaleRelative(v,200);
-								//					Matrix matrix=new Matrix();
-								//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
-								//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
-								//					((ImageView)v).setImageMatrix(matrix);
-								//					v.setRotation(180);
-							}
-						});
-
-						alert.setNeutralButton("Rotate", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								// Canceled.
-								//				  scaleImageAbsolute((ImageView)v, 300);
-								//					scaleRelative(v,200);
-								//					Matrix matrix=new Matrix();
-								//					((ImageView)v).setScaleType(ScaleType.MATRIX);   //required
-								//					matrix.postRotate( 45f, ((ImageView)v).getDrawable().getBounds().width()/2, ((ImageView)v).getDrawable().getBounds().height()/2);
-								//					((ImageView)v).setImageMatrix(matrix);
-
-
-								String value = input.getText().toString() ;
-
-								if(value.length() == 0)
-								{
-									toast("No text entered Error") ;
-									return ;
-								}
-
-								Float rotate = Float.parseFloat(value) ;
-								v.setRotation(rotate);
-
-								FileOutputStream fos = null;
-								try {
-									fos = openFileOutput(fileName, MODE_APPEND);
-								} catch (FileNotFoundException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-
-								try {
-									fos.write(("r" + "," + v.getId() + "," + rotate + "\n").getBytes());
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-
-								try {
-									fos.close();
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-						}) ;
-
-						alert.show();
-			 */
 			return true ;
 		}
 		else if(currentTouchMode == TouchMode.MOVE )
@@ -1274,15 +1145,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 		trace("ImageId move " + imageId) ;
 		final View logoFocus = (View)findViewById(imageId) ;
-
-		//		final float amountToMoveDown = yFinal - yInitial ;
-		//		final float amountToMoveRight = xFinal - xInitial ;
-
-		//		Animation anim= new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown); 
 		Animation anim = new TranslateAnimation(0,(xFinal-xInitial),0,(yFinal-yInitial)) ;
 		anim.setDuration(1000); 
-		//	anim.setFillAfter(true); 
-		//	anim.setFillEnabled(true); 
 		anim.setAnimationListener(new AnimationListener() {
 
 			public void onAnimationStart(Animation arg0) {
@@ -1325,25 +1189,15 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 		int imageAdded = 0 ;
 		float rotate = 0 ;
 		float scale = 0;
-		//		int i = 1 ;
 		int w,h,left,top ;
 		String quesRead = "" ;
 		String ansRead = "" ;
-		//		boolean answeredCorrect = false ;
 		DragLayer.LayoutParams lp ;
 		try {
 			String line;
-			//			trace("line NO " + lineNo) ;
-			//			while(i < lineNo)
-			//			{
-			//				line = reader.readLine() ;
-			//				i++ ;
-			//				
-			//			}
 			if ((line = reader.readLine()) != null) 
 			{
 				trace("line Read in nextMove " + line) ;
-				//				reader.mark(4096);
 
 				RowData = line.split(",");
 				switch(RowData[0].charAt(0))
@@ -1353,21 +1207,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					imageId = Integer.parseInt(RowData[2]) ;
 					ImageView newView = new ImageView (this);
 					newView.setImageResource(imageIdInt[imageAdded]) ;			
-					//					switch(imageAdded)
-					//					{
-					//					case 0:
-					//						newView.setImageResource(R.drawable.exp_simulation_battery);
-					//						break ;
-					//					case 1:
-					//						newView.setImageResource(R.drawable.exp_simulation_bulb);
-					//						break ;
-					//					case 2:
-					//						newView.setImageResource(R.drawable.exp_simulation_resistor);
-					//						break ;
-					//					default:
-					//						break ;	
-					//					}
-
 					newView.setId(imageId);
 					w = 60;
 					h = 60;
@@ -1375,12 +1214,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					top = 100;
 					lp = new DragLayer.LayoutParams (w, h, left, top);
 					mDragLayer.addView (newView, lp);
-					//					newView.setOnClickListener(this);
-					//					newView.setOnLongClickListener(this);
-					//					newView.setOnTouchListener(this);
 					if(ghostMode)
 						newView.setAlpha(30);
-					//					nextMove(reader) ;
 
 					MyAbsoluteLayout.LayoutParams lpMove = (MyAbsoluteLayout.LayoutParams) newView.getLayoutParams();
 					lpMove.x = (int)(0.3 * screenMetrics.widthPixels) ;
@@ -1391,21 +1226,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					{
 						ImageView newViewForUser = new ImageView (this);
 						newViewForUser.setImageResource(imageIdInt[imageAdded]) ;
-						//						switch(imageAdded)
-						//						{
-						//						case 0:
-						//							newViewForUser.setImageResource(R.drawable.exp_simulation_battery);
-						//							break ;
-						//						case 1:
-						//							newViewForUser.setImageResource(R.drawable.exp_simulation_bulb);
-						//							break ;
-						//						case 2:
-						//							newViewForUser.setImageResource(R.drawable.exp_simulation_resistor);
-						//							break ;
-						//						default:
-						//							break ;	
-						//						}
-
 						newViewForUser.setId(imageId+100);
 						trace("NewViewForUser id = " + newViewForUser.getId()) ;
 						w = 60;
@@ -1417,11 +1237,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						newViewForUser.setOnClickListener(this);
 						newViewForUser.setOnLongClickListener(this);
 						newViewForUser.setOnTouchListener(this);
-						//						if(ghostMode)
-						//							newView.setAlpha(30);
-						//						//					nextMove(reader) ;
-
-
 
 						MyAbsoluteLayout.LayoutParams lpMoveForUser = (MyAbsoluteLayout.LayoutParams) newViewForUser.getLayoutParams();
 						lpMoveForUser.x = (int)(0.3 * screenMetrics.widthPixels) ;
@@ -1451,8 +1266,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					finX /= 100 ;
 					finY /= 100 ;
 
-					//					trace("initX = " + initX) ;
-					//					trace("heightPixels = " + screenMetrics.heightPixels) ;
 					anim(imageId,initX,initY,finX,finY);
 					caseRead = 'm' ;
 					break ;
@@ -1473,20 +1286,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					scale /= 100 ;
 					scale *= screenMetrics.heightPixels ;
 
-					//					float scaleDec = scale / 100 ;
-					//					//				trace("scaleDec" + scaleDec) ;
-					//					//				trace("getLayoutHeight before"+v.getLayoutParams().height) ;
-					//					((ImageView)findViewById(imageId)).getLayoutParams().height *= scaleDec ;
-					//					//				trace("getLayoutHeight after"+v.getLayoutParams().height) ;
-					//					((ImageView)findViewById(imageId)).getLayoutParams().width *= scaleDec ;
-					//					((ImageView)findViewById(imageId)).setLayoutParams(((ImageView)findViewById(imageId)).getLayoutParams());
 					scaleAbsolute(findViewById(imageId), scale);
 					caseRead = 's' ;
 					break ;
 				case 't':
-					//					textRead = RowData[1] ;
-					//					imageId = Integer.parseInt(RowData[2]) ;
-
 					imageId = Integer.parseInt(RowData[1]);
 					quesRead = RowData[2] ;
 					ansRead = RowData[3] ;
@@ -1503,7 +1306,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						tv.setLayoutParams(lpText);
 						if(ghostMode)
 							tv.setAlpha(30) ;
-						
+
 						if(ghostMode && studentMode)
 						{
 							TextView tvForUser = new TextView(this) ;
@@ -1557,7 +1360,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 											trace("Value equals ansComp = " + value.toString().equalsIgnoreCase(ansComp)) ;
 											if(value.toString().equalsIgnoreCase(ansComp))
 											{
-//												DragController.setMoveNo(DragController.getMoveNo() + 1);
+												//												DragController.setMoveNo(DragController.getMoveNo() + 1);
 												TextView tv = new TextView((Context) thisObj);
 												tv.setText(ansComp);
 												mDragLayer.addView (tv);
@@ -1566,10 +1369,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 												lpText.x = (int)(0.3 * screenMetrics.widthPixels) ;
 												lpText.y = (int) (0.4 * screenMetrics.heightPixels) - yOffSet ;
 												tv.setLayoutParams(lpText);
-												
+
 												if(ghostMode)
 													tv.setAlpha(30) ;
-												
+
 												if(ghostMode && studentMode)
 												{
 													TextView tvForUser = new TextView((Context) thisObj) ;
@@ -1588,7 +1391,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 
 												playBackForGhostMode(null) ;
 												DragController.setMoveNo(DragController.getMoveNo()+1);
-												
+
 												d.dismiss(); 
 											}
 											else
@@ -1608,21 +1411,12 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						else
 						{
 							TextView tv = new TextView(this);
-							//					trace(m_Text) ;
 							tv.setText(ansRead);
 
-							//					w = 60;
-							//					h = 60;
-							//					left = 80;
-							//					top = 100;
-							//					lp = new DragLayer.LayoutParams (w, h, left, top);
 							mDragLayer.addView (tv);
-							//							tv.setOnClickListener((OnClickListener) this);
-							//							tv.setOnLongClickListener((OnLongClickListener) this);
-							//							tv.setOnTouchListener((OnTouchListener) this);
 							if(ghostMode)
 								tv.setAlpha(30) ;
-							
+
 							if(ghostMode && studentMode)
 							{
 								TextView tvForUser = new TextView(this) ;
@@ -1665,137 +1459,32 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					finX /= 100 ;
 					finY /= 100 ;
 
-					createLine((ImageView)findViewById(R.id.blankBackground), initX, initY, finX, finY, Color.GREEN);
+					createLine((ImageView)findViewById(R.id.blankBackground), initX, initY-yOffSet, finX, finY-yOffSet, Color.GREEN);
 					caseRead = 'l' ;
 					break ;
 				case 'd':
 					imageId = Integer.parseInt(RowData[1]) ;
 					trace("Delete" + " id " + imageId) ;
 					findViewById(imageId).setVisibility(View.GONE);
+					if(studentMode && ghostMode)
+					{
+						findViewById(imageId + 100).setVisibility(View.GONE) ;
+					}
+					caseRead = 'd' ;
 					break ;
 				case 'c':
 					imageId = Integer.parseInt(RowData[1]) ;
 					int imageNoChange = Integer.parseInt(RowData[2]) ;
 					((ImageView)findViewById(imageId)).setImageResource(imageIdInt[imageNoChange]) ;
-					//					switch(imageNoChange)
-					//					{
-					//					case 0:
-					//						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_battery);
-					//						break ;
-					//					case 1:
-					//						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_bulb);
-					//						break ;
-					//					case 2:
-					//						((ImageView)findViewById(imageId)).setImageResource(R.drawable.exp_simulation_resistor);
-					//						break ;
-					//					default:
-					//						break ;	
-					//					}
 
 					if(studentMode && ghostMode)
 					{
 						((ImageView)findViewById(imageId+100)).setImageResource(imageIdInt[imageNoChange]) ;
-						//						switch(imageNoChange)
-						//						{
-						//						case 0:
-						//							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_battery);
-						//							break ;
-						//						case 1:
-						//							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_bulb);
-						//							break ;
-						//						case 2:
-						//							((ImageView)findViewById(imageId+100)).setImageResource(R.drawable.exp_simulation_resistor);
-						//							break ;
-						//						default:
-						//							break ;	
-						//						}
 					}
 
 					caseRead = 'c' ;
-					break ;
-					//				case 'q':
-					//					caseRead = 'q' ;
-					//					quesRead = RowData[1] ;
-					//					ansRead = RowData[2] ;
-					//
-					//					//					final String ansComp = ansRead ;
-					//					//
-					//					//					if(studentMode)
-					//					//					{
-					//					//						//						do
-					//					//						//						{
-					//					//
-					//					//						final EditText input = new EditText((Context) thisObj);
-					//					//						//						alert.setView(input);
-					//					//						final AlertDialog d = new AlertDialog.Builder((Context) thisObj)
-					//					//						.setView(input)
-					//					//						.setTitle(quesRead)
-					//					//						.setMessage(quesRead)
-					//					//						.setPositiveButton(android.R.string.ok, null) //Set to null. We override the onclick
-					//					//						//				        .setNegativeButton(android.R.string.cancel, null)
-					//					//						.create();
-					//					//
-					//					//						d.setOnShowListener(new DialogInterface.OnShowListener() {
-					//					//
-					//					//							@Override
-					//					//							public void onShow(DialogInterface dialog) {
-					//					//
-					//					//								Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
-					//					//								b.setOnClickListener(new View.OnClickListener() {
-					//					//
-					//					//									@Override
-					//					//									public void onClick(View view) {
-					//					//										//										d.dismiss(); 
-					//					//										Editable value = input.getText();
-					//					//										trace("Got text = " + value);
-					//					//										trace("ansComp = " + ansComp) ;
-					//					//										trace("Value equals ansComp = " + value.toString().equalsIgnoreCase(ansComp)) ;
-					//					//										if(value.toString().equalsIgnoreCase(ansComp))
-					//					//										{
-					//					//											DragController.setMoveNo(DragController.getMoveNo() + 1);
-					//					//											playBackForGhostMode(null) ;
-					//					//											d.dismiss(); 
-					//					//										}
-					//					//										else
-					//					//										{
-					//					//											toast("Wrong -- Enter again");
-					//					//										}
-					//					//
-					//					//
-					//					//										// TODO Do something
-					//					//
-					//					//										//Dismiss once everything is OK.
-					//					//										//				                d.dismiss();
-					//					//									}
-					//					//								});
-					//					//							}
-					//					//						});
-					//					//
-					//					//						d.show(); 
-					//					//					}
-					//					//					else
-					//					//					{
-					//					//						trace("Entered q else with ques " + quesRead + " ans " + ansRead) ;
-					//					//					}
-					//
-					//					//					if(answeredCorrect)
-					//					//					{
-					//					//						answeredCorrect = false ; 
-					//					//						DragController.setMoveNo(DragController.getMoveNo() + 1);
-					//					//						playBackForGhostMode(null) ;
-					//					//					}
-					//					//					else
-					//					//						trace("Answered Wrong") ;
-					//					break ;
+					break ;	
 				}
-
-				//				line = reader.readLine() ;
-				//				if(line!=null)
-				//				{
-				//					RowData = line.split(",");
-				//					caseRead = RowData[0].charAt(0) ;
-				//				}
-				//				reader.reset();
 			}
 			else
 			{
@@ -2139,7 +1828,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				deleteMode = false ;
 				toast("Move Mode") ;
 				currentTouchMode = TouchMode.MOVE ;
-				//				objectSelectedForScaleRotate = null ;
 				findViewById(R.id.seekArc).setVisibility(View.INVISIBLE);
 				findViewById(R.id.scaleBar).setVisibility(View.INVISIBLE);
 				findViewById(R.id.plusSignImage).setVisibility(View.INVISIBLE);
@@ -2149,15 +1837,7 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				if(objectSelectedForScaleRotate!=null)
 					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(0, 0, 0, 0));
 			}
-
 			break;
-			//		case R.id.rotateRadioButton:
-			//			if (checked)
-			//			{
-			//				toast("Rotate");
-			//				currentTouchMode = TouchMode.ROTATE ;
-			//			}
-			//			break;
 		case R.id.scaleRadioButton:
 			if(checked)
 			{
@@ -2176,7 +1856,6 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				findViewById(R.id.minusSignImage).bringToFront();
 				if(objectSelectedForScaleRotate!=null)
 					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(100, 255, 0, 0));
-				//				objectSelectedForScaleRotate = objectSelectedForScaleRotate ;
 			}
 			break ;
 		case R.id.deleteRadioButton:
@@ -2190,6 +1869,8 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 				findViewById(R.id.plusSignImage).setVisibility(View.INVISIBLE);
 				findViewById(R.id.minusSignImage).setVisibility(View.INVISIBLE);
 				findViewById(R.id.rotateValueText).setVisibility(View.INVISIBLE);
+				if(objectSelectedForScaleRotate!=null)
+					objectSelectedForScaleRotate.setBackgroundColor(Color.argb(100, 255, 0, 0));
 			}
 			break ;
 		}
@@ -2215,11 +1896,9 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 						((TextView)objectSelectedForScaleRotate).setTextSize(progress);
 						((TextView)objectSelectedForScaleRotate).setTop(0);
 						((TextView)objectSelectedForScaleRotate).setLeft(0);
-						//						((TextView)objectSelectedForScaleRotate).setGravity(Gravity.CENTER);
 						scaleTextView(objectSelectedForScaleRotate,progress) ;
 						((TextView)objectSelectedForScaleRotate).setLeft(0);
 						((TextView)objectSelectedForScaleRotate).setTop(0);
-						//						((TextView)objectSelectedForScaleRotate).setGravity(Gravity.CENTER);
 					}
 				}
 				//				scaleRelative(objectSelectedForScaleRotate,scale);
@@ -2251,13 +1930,14 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						return ;
 					}
 
 					try {
 						fos.write(("s" + "," + objectSelectedForScaleRotate.getId() + "," + (scale/screenMetrics.heightPixels)*100 + "\n").getBytes());
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						return ;
 					}
 
 					try {
@@ -2656,22 +2336,22 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 	}
 
 	private boolean doubleBackToExitPressedOnce = false;
-	
+
 	@Override
 	public void onBackPressed() {
-	    if (doubleBackToExitPressedOnce) {
-	        super.onBackPressed();
-	        return;
-	    }
+		if (doubleBackToExitPressedOnce) {
+			super.onBackPressed();
+			return;
+		}
 
-	    this.doubleBackToExitPressedOnce = true;
-	    Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+		this.doubleBackToExitPressedOnce = true;
+		Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
-	    new Handler().postDelayed(new Runnable() {
+		new Handler().postDelayed(new Runnable() {
 
-	        @Override
-	        public void run() {
-	            doubleBackToExitPressedOnce=false;                       
-	        }
-	    }, 2000);
+			@Override
+			public void run() {
+				doubleBackToExitPressedOnce=false;                       
+			}
+		}, 2000);
 	} } // end class
