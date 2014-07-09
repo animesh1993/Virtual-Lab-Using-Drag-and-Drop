@@ -2007,10 +2007,10 @@ implements View.OnLongClickListener, View.OnClickListener, View.OnTouchListener
 							char movePer ;
 							if(ghostMode)
 							{
-								do{
+								do
+								{
 									movePer = playBackForGhostMode(null) ;
 									DragController.setMoveNo(DragController.getMoveNo()+1);
-									//									DragController.setMoveNo(DragController.getMoveNo() + 1 );
 								}
 								while(movePer == 'd'
 										|| movePer == 'a'
